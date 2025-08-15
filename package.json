@@ -1,6 +1,6 @@
 {
   "name": "battleship-game",
-  "version": "0.0.01",
+  "version": "0.0.09",
   "description": "Battleship game in vanilla javascript",
   "main": "index.js",
   "homepage": "",
