@@ -1,0 +1,59 @@
+{
+  "name": "weatherjs",
+  "version": "0.4.15",
+  "description": "a weather application",
+  "main": "index.js",
+  "homepage": "https://voiceinthedark.github.io/weatherjs/",
+  "scripts": {
+    "build": "webpack --config webpack.prod.js",
+    "dev": "webpack serve --config webpack.dev.js",
+    "deploy": "git subtree push --prefix dist origin gh-pages",
+    "pages": "gh-pages -d dist",
+    "test": "npx jest",
+    "lint": "npx eslint .",
+    "format": "npx prettier --write .",
+    "format:check": "npx prettier --check .",
+    "prelint": "npm run format:check",
+    "postlint": "npm run format",
+    "jsdoc": "jsdoc -c jsdoc.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "url+https://github.com/voiceinthedark/weatherjs.git"
+  },
+  "keywords": [
+    "weather",
+    "api",
+    "javascript",
+    "vanilla-javascript",
+    "css",
+    "webpack",
+    "geolocation"
+  ],
+  "author": "voiceinthedark",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/voiceinthedark/weatherjs/issues"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.31.0",
+    "css-loader": "^7.1.2",
+    "eslint": "^9.31.0",
+    "gh-pages": "^6.3.0",
+    "html-loader": "^5.1.0",
+    "html-webpack-plugin": "^5.6.3",
+    "jest": "^30.0.4",
+    "jsdoc": "^4.0.4",
+    "prettier": "3.6.2",
+    "style-loader": "^4.0.0",
+    "svg-inline-loader": "^0.8.2",
+    "webpack": "^5.100.2",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2",
+    "webpack-merge": "^6.0.1"
+  },
+  "dependencies": {
+    "date-fns": "^4.1.0",
+    "uuid": "^11.1.0"
+  }
+}
