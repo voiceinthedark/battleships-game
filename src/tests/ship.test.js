@@ -21,22 +21,33 @@ describe('Battleship module tests', () => {
   })
 
   describe('hit method tests', () => {
-    test('hitting a ship should return true when hit', () => {
-      expect(ship.hit()).toBeTruthy()
+    let s = new Ship('Carrier', 6, 'horizontal', [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6]])
+    test('hit on a ship coordinates returns true', () => {
+      expect(s.hit([0, 5])).toBeTruthy()
+
     })
   })
 
   describe('isSunk method tests', () => {
+    let s;
+    beforeEach(() => {
+      s = new Ship('submarine', 3, 'horizontal', [[0, 3], [0, 4], [0, 5]])
+    })
     test('if ship is not fully hit, isSunk returns false', () => {
-      expect(ship.isSunk()).toBeFalsy()
+      expect(s.isSunk()).toBeFalsy()
     })
     test('Ship fully hit returns true', () => {
-      ship.hit()
-      ship.hit()
-      ship.hit()
-      ship.hit()
-      ship.hit()
-      expect(ship.isSunk()).toBeTruthy()
+      s.hit([0, 3])
+      s.hit([0, 4])
+      s.hit([0, 5])
+      expect(s.isSunk()).toBeTruthy()
     })
+
+    test('ship partially hit is not sunk', () => {
+      s.hit([0, 3])
+      s.hit([0, 4])
+      expect(s.isSunk()).toBeFalsy()
+    })
+
   })
 })

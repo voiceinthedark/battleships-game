@@ -45,6 +45,14 @@ class Square {
   isHit() {
     return this.#hit
   }
+
+  /**
+   * Set the hit property of the square
+   * @param {boolean} val 
+   * */
+  set hit(val){
+    this.#hit = val
+  }
 }
 
 /** @module Square */
