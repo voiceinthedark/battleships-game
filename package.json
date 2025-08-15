@@ -1,15 +1,16 @@
 {
-  "name": "weatherjs",
-  "version": "0.4.15",
-  "description": "a weather application",
+  "name": "battleship-game",
+  "version": "0.0.01",
+  "description": "Battleship game in vanilla javascript",
   "main": "index.js",
-  "homepage": "https://voiceinthedark.github.io/weatherjs/",
+  "homepage": "",
   "scripts": {
     "build": "webpack --config webpack.prod.js",
     "dev": "webpack serve --config webpack.dev.js",
-    "deploy": "git subtree push --prefix dist origin gh-pages",
-    "pages": "gh-pages -d dist",
-    "test": "npx jest",
+    "deploy": "gh-pages -d dist",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watchall",
     "lint": "npx eslint .",
     "format": "npx prettier --write .",
     "format:check": "npx prettier --check .",
@@ -19,24 +20,29 @@
   },
   "repository": {
     "type": "git",
-    "url": "url+https://github.com/voiceinthedark/weatherjs.git"
+    "url": ""
   },
   "keywords": [
-    "weather",
-    "api",
     "javascript",
     "vanilla-javascript",
     "css",
     "webpack",
-    "geolocation"
+    "battleship-game",
+    "battleship",
+    "jest",
+    "tdd"
   ],
   "author": "voiceinthedark",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/voiceinthedark/weatherjs/issues"
+    "url": ""
   },
   "devDependencies": {
+    "@babel/core": "^7.28.3",
+    "@babel/preset-env": "^7.28.3",
     "@eslint/js": "^9.31.0",
+    "@types/jest": "^30.0.0",
+    "babel-jest": "^30.0.5",
     "css-loader": "^7.1.2",
     "eslint": "^9.31.0",
     "gh-pages": "^6.3.0",
@@ -51,9 +57,5 @@
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.2",
     "webpack-merge": "^6.0.1"
-  },
-  "dependencies": {
-    "date-fns": "^4.1.0",
-    "uuid": "^11.1.0"
   }
 }
