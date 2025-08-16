@@ -85,8 +85,6 @@ class Ship {
    * @returns {boolean}
    * */
   hit(coords = []) {
-    // TODO: set which coordinate has been hit
-    // search for the square
     if(!coords) return false;
     let idx = this.#coordinates.findIndex(
       (s) => s.x === coords[0] && s.y === coords[1])
@@ -95,7 +93,6 @@ class Ship {
       this.#hits++;
       return true;
     }
-
     return false
   }
 
