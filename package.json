@@ -1,9 +1,9 @@
 {
   "name": "battleship-game",
-  "version": "0.0.23",
+  "version": "0.0.30",
   "description": "Battleship game in vanilla javascript",
   "main": "index.js",
-  "homepage": "",
+  "homepage": "https://github.com/voiceinthedark/battleships-game",
   "scripts": {
     "build": "webpack --config webpack.prod.js",
     "dev": "webpack serve --config webpack.dev.js",
@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/voiceinthedark/battleships-game.git"
   },
   "keywords": [
     "javascript",
@@ -35,7 +35,7 @@
   "author": "voiceinthedark",
   "license": "ISC",
   "bugs": {
-    "url": ""
+    "url": "https://github.com/voiceinthedark/battleships-game/issues"
   },
   "devDependencies": {
     "@babel/core": "^7.28.3",

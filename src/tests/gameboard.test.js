@@ -1,3 +1,4 @@
+import Ship from "../modules/ship.js";
 import GameBoard from "../modules/gameboard.js"
 
 describe('Gameboard module tests', () => {
@@ -31,5 +32,27 @@ describe('Gameboard module tests', () => {
     test('playerBoard is filled with 0s', () => {
       expect(gameboard.playerBoard.every(a => a.every(b => b === 0))).toBeTruthy()
     })
+  })
+
+  describe('placeShip method tests', () => {
+    test('placing ship inside bounds return true', () => {
+      let ship = new Ship('test', 5, 'horizontal', [[0,5], [0,6], [0,7], [0,8], [0,9]])
+      expect(gameboard.placeShip(ship, [0, 5], gameboard.playerBoard)).toBeTruthy()
+    })
+
+    test('placing ship outside of bounds should return false', () => {
+      let ship = new Ship('test', 5, 'horizontal')
+      expect(gameboard.placeShip(ship, [0, 11], gameboard.playerBoard)).toBeFalsy()
+    })
+
+    test('if another ship occupies a cell placeShip should return false', () => {
+      let ship = new Ship('t1', 5, 'horizontal')
+      let ship2 = new Ship('t2', 3, 'vertical')
+      // They collide at [0, 5]
+      expect(gameboard.placeShip(ship, [0, 5], gameboard.playerBoard)).toBeTruthy()
+      expect(gameboard.placeShip(ship2, [0,5], gameboard.playerBoard)).toBeFalsy()
+    })
+    
+    
   })
 })

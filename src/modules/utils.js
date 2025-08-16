@@ -22,6 +22,27 @@ class Utils {
     }
     return res;
   }
+
+  /**
+   * helper function to extract coordinates of a ship
+   * @param {Array[number]} point - The starting location of the ship 
+   * @param {number} length - the length of the ship
+   * @param {string} orientation - the orientation of the ship
+   * @returns {Array<Array>}
+   * */
+  static getCoordinatesFromPoint(point, length, orientation){
+    let res = []
+    for(let i = 0; i < length; i++){
+      if(orientation === 'horizontal'){
+        res.push([point[0], point[1] + i])
+      }
+      if(orientation === 'vertical'){
+        res.push([point[0] + i, point[1]])
+      }
+    }
+
+    return res
+  }
 }
 
 export default Utils;
