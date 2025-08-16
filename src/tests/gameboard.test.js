@@ -3,7 +3,7 @@ import GameBoard from "../modules/gameboard.js"
 
 describe('Gameboard module tests', () => {
   let gameboard;
-  beforeAll(() => {
+  beforeEach(() => {
     gameboard = new GameBoard();
   })
 
@@ -36,7 +36,7 @@ describe('Gameboard module tests', () => {
 
   describe('placeShip method tests', () => {
     test('placing ship inside bounds return true', () => {
-      let ship = new Ship('test', 5, 'horizontal', [[0,5], [0,6], [0,7], [0,8], [0,9]])
+      let ship = new Ship('test', 5, 'horizontal', [[0, 5], [0, 6], [0, 7], [0, 8], [0, 9]])
       expect(gameboard.placeShip(ship, [0, 5], gameboard.playerBoard)).toBeTruthy()
     })
 
@@ -50,9 +50,18 @@ describe('Gameboard module tests', () => {
       let ship2 = new Ship('t2', 3, 'vertical')
       // They collide at [0, 5]
       expect(gameboard.placeShip(ship, [0, 5], gameboard.playerBoard)).toBeTruthy()
-      expect(gameboard.placeShip(ship2, [0,5], gameboard.playerBoard)).toBeFalsy()
+      expect(gameboard.placeShip(ship2, [0, 5], gameboard.playerBoard)).toBeFalsy()
     })
-    
-    
+
+    test('placing two ships that do not collide works correctly', () => {
+      let s = new Ship('t1', 5, 'horizontal')
+      let s2 = new Ship('t2', 3, 'vertical')
+
+      expect(gameboard.placeShip(s, [0, 0], gameboard.playerBoard)).toBeTruthy()
+      expect(gameboard.placeShip(s2, [4, 5], gameboard.playerBoard)).toBeTruthy()
+      expect(gameboard.playerShips).toHaveLength(2)
+    })
+
+
   })
 })

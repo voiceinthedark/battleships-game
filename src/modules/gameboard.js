@@ -1,13 +1,16 @@
 // gameboard.js
 // @ts-check
 
+import Ship from "./ship.js"
+import Utils from "./utils.js"
+
 
 /**
  * @class GameBoard
  * @classdesc gameboard module to control the placement of ships and register attacks
  * on the board
  * */
-class GameBoard{
+class GameBoard {
   #height
   #width
   #playerShips
@@ -22,7 +25,7 @@ class GameBoard{
    * @param {number} [height=14] height of the board (default 14) 
    * @param {number} [width=14] width of the board (default 14)
    * */
-  constructor(height = 14, width = 14){
+  constructor(height = 14, width = 14) {
     this.#height = height;
     this.#width = width;
     this.#playerShips = [] // an array containing a list of Ship objects
@@ -33,28 +36,36 @@ class GameBoard{
     this.#fillTheBoard(this.#computerBoard)
   }
 
-  get width(){
+  get width() {
     return this.#width
   }
 
-  get height(){
+  get height() {
     return this.#height
   }
 
-  get playerBoard(){
+  get playerBoard() {
     return this.#playerBoard
   }
 
-  get computerBoard(){
+  get computerBoard() {
     return this.#computerBoard
+  }
+
+  get playerShips() {
+    return this.#playerShips
+  }
+
+  get computerShips() {
+    return this.#computerShips
   }
 
   /**
    * @method helper function to fill the boards and initialize it
    * @param {Array<Array>} board 
    * */
-  #fillTheBoard(board){
-    for(let i = 0; i < this.#height; i++){
+  #fillTheBoard(board) {
+    for (let i = 0; i < this.#height; i++) {
       let arr = new Array(14);
       arr = arr.fill(0)
       board.push(arr)
@@ -63,20 +74,85 @@ class GameBoard{
 
   /**
    * @method to place the ship on the board
-   * @param {number} start - start between 0 and width or height - length 
-   * @param {string} orientation - Either vertical or horizontal
+   * @param {Ship} ship 
+   * @param {Array<number>} start - start between 0 and width or height - length 
    * @param {Array<Array>} board - The board where the ship should be placed (computer or player)
+   * @returns {boolean}
    * */
-  placeShip(start, orientation, board){
+  placeShip(ship, start, board) {
     // TODO: place ship on the coordinates provided with 
     // the orientation taken into account
+    // WARN: Refactor, too big it will become
 
+    if (!this.#checkBoundaries(ship, start, board)) return false
+
+    // Check for collision
+    // WARNING: Take care that ships can't overlap
+    let coords = Utils.getCoordinatesFromPoint(start, ship.length, ship.orientation)
+    if (Utils.isInteresect(coords, board))
+      return false;
+
+    // WARN: player board and computer board are distinct
+    // place the ship on the board
+    // NOTE Assess where the ship should be located on the board
+    // NOTE horizontal on the x axis, i.e the inner array
+    // NOTE vertical on the y axis
+    if (board === this.playerBoard) {
+      // fill player board with 1 for occupied
+      for (let i = 0; i < ship.length; i++) {
+        if (ship.orientation === 'horizontal') {
+          this.playerBoard[start[0]][start[1] + i] = 1
+        } else if (ship.orientation === 'vertical') {
+          this.playerBoard[start[0] + i][start[1]] = 1
+        }
+      }
+      // add ship to player fleet
+      // NOTE Add the ship to the corresponding ship tables
+      this.#playerShips.push(ship)
+    }
+    if (board === this.computerBoard) {
+      // fill computer board
+      for (let i = 0; i < ship.length; i++) {
+        if (ship.orientation === 'horizontal') {
+          this.computerBoard[start[0]][start[1] + i] = 1
+        } else if (ship.orientation === 'vertical') {
+          this.computerBoard[start[0] + i][start[1]] = 1
+        }
+      }
+
+      // NOTE: add ship to computer's fleet
+      this.#computerShips.push(ship)
+    }
+    return true;
+  }
+
+  /**
+   * helper method to check if the ship falls into boundary
+   * @param {Ship} ship 
+   * @param {Array<number>} start 
+   * @param {Array<Array>} board 
+   * */
+  #checkBoundaries(ship, start, board) {
+    if (ship.orientation === 'horizontal') {
+      if (start[1] + ship.length > board[0].length) {
+        return false
+      }
+    }
+
+    if (ship.orientation === 'vertical') {
+      if (start[0] + ship.length > board.length) {
+        return false
+      }
+    }
+    return true
   }
 
   /**
    * @method to receive the attack on the board
+   * @param {Array<number>} coords 
+   * @param {Array<Array>} board 
    * */
-  receiveAttack(){
+  receiveAttack(coords, board) {
     // TODO: receive an attack on the board and calculate 
     // hits and misses according to each player
 
@@ -87,7 +163,7 @@ class GameBoard{
    * @param {*} player - The player whose fleet to be checked 
    * @returns {boolean}
    * */
-  shipsSunk(player){
+  shipsSunk(player) {
     // TODO: check the player fleet for whether his fleet has been sunk
     return false;
   }
