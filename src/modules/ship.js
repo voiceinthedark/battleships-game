@@ -2,6 +2,7 @@
 // @ts-check
 
 import Square from "./square.js"
+import Utils from "./utils.js"
 
 /**
  * @class
@@ -30,8 +31,7 @@ class Ship {
     this.#hits = 0
     this.#orientation = orientation
     // initialize Square[]
-    this.#coordinates = []
-    this.#initCoords(coordinates)
+    this.#coordinates = Utils.initCoords(coordinates)
   }
 
   /**
@@ -68,15 +68,11 @@ class Ship {
   }
 
   /**
-   * initialize the coordinates into an array of Sqaures
-   * @param {Array<Array>} coords 
+   * Set the coordinates of the ship
+   * @param {Array<Square>} val 
    * */
-  #initCoords(coords) {
-    if (!coords) return;
-
-    for (let c of coords) {
-      this.#coordinates.push(new Square(c[0], c[1]))
-    }
+  set coordinates(val) {
+    this.#coordinates = val
   }
 
   /**
@@ -85,7 +81,7 @@ class Ship {
    * @returns {boolean}
    * */
   hit(coords = []) {
-    if(!coords) return false;
+    if(coords.length <= 0) return false;
     let idx = this.#coordinates.findIndex(
       (s) => s.x === coords[0] && s.y === coords[1])
     if (idx >= 0 && !this.coordinates[idx].isHit()) {
