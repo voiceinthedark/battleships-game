@@ -34,4 +34,46 @@ describe('Utils helper methods', () => {
     })
 
   })
+
+  describe('isIntersect method tests', () => {
+    let coords = [[0,3], [0,4], [0,5]]
+    let coords2 = [[0,0], [1,0], [2,0]]
+    let board = [
+      [0, 0, 0, 0, 1, 0, 0],
+      [0, 0, 0, 0, 1, 0, 0],
+      [0, 0, 0, 0, 1, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0],
+    ]
+    test('returns true if there is a collision point on the board', () => {
+      expect(Utils.isInteresect(coords, board)).toBeTruthy()
+    })
+
+    test('Should return false if there are no collision', () => {
+      expect(Utils.isInteresect(coords2, board)).toBeFalsy()
+    })
+  })
+
+  describe('pointOfCollision method tests', () => {
+    let coords = [[0,3], [0,4], [0,5]]
+    let coords2 = [[0,0], [1,0], [2,0]]
+    let board = [
+      [0, 0, 0, 0, 1, 0, 0],
+      [0, 0, 0, 0, 1, 0, 0],
+      [0, 0, 0, 0, 1, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0],
+    ]
+    test('method should return the exact point of collision', () => {
+      expect(Utils.pointOfCollision(coords, board)).toEqual([0, 4])
+    })
+
+    test('method should return null when there is no collision', () => {
+      expect(Utils.pointOfCollision(coords2, board)).toBeNull()
+    })
+  })
 })

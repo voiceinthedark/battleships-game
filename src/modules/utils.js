@@ -30,18 +30,32 @@ class Utils {
    * @param {string} orientation - the orientation of the ship
    * @returns {Array<Array>}
    * */
-  static getCoordinatesFromPoint(point, length, orientation){
+  static getCoordinatesFromPoint(point, length, orientation) {
     let res = []
-    for(let i = 0; i < length; i++){
-      if(orientation === 'horizontal'){
+    for (let i = 0; i < length; i++) {
+      if (orientation === 'horizontal') {
         res.push([point[0], point[1] + i])
       }
-      if(orientation === 'vertical'){
+      if (orientation === 'vertical') {
         res.push([point[0] + i, point[1]])
       }
     }
-
     return res
+  }
+
+  /**
+   * helper method to check if the set of coordinates collides with others on the board
+   * @param {Array<Array>} coords 
+   * @param {Array<Array>} board 
+   * */
+  static isInteresect(coords, board) {
+    return coords.some(c => {
+      if (board[c[0]][c[1]] === 1) {
+        return true
+      }
+      return false
+    })
+
   }
 }
 
