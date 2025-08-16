@@ -47,6 +47,7 @@ class Utils {
    * helper method to check if the set of coordinates collides with others on the board
    * @param {Array<Array>} coords 
    * @param {Array<Array>} board 
+   * @returns {boolean}
    * */
   static isInteresect(coords, board) {
     return coords.some(c => {
@@ -55,7 +56,19 @@ class Utils {
       }
       return false
     })
+  }
 
+  /**
+   * helper method to return the point of collision on the board
+   * @param {Array<Array>} coords 
+   * @param {Array<Array>} board 
+   * @returns {Array | null}
+   * */
+  static pointOfCollision(coords, board){
+    if(!this.isInteresect(coords, board))
+      return null
+
+    return coords.filter(c => board[c[0]][c[1]] === 1).pop()
   }
 }
 
