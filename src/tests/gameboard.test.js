@@ -78,4 +78,50 @@ describe('Gameboard module tests', () => {
       expect(s.coordinates.at(0)).not.toEqual(new Square(5, 3))
     })
   })
+
+  describe('receiveAttack method tests', () => {
+    let g = new GameBoard()
+    let s = new Ship('Carrier', 6, 'horizontal')
+    let s2 = new Ship('Destroyer', 5, 'vertical')
+    let s3 = new Ship('Gunboat', 2, 'horizontal')
+
+    let c = new Ship('Carrier', 6, 'horizontal')
+    let c2 = new Ship('Destroyer', 5, 'vertical')
+    let c3 = new Ship('Gunboat', 2, 'horizontal')
+    beforeAll(() => {
+      g.placeShip(s, [0, 0], g.playerBoard)
+      g.placeShip(s2, [4, 6], g.playerBoard)
+      g.placeShip(s3, [8, 9], g.playerBoard)
+
+      g.placeShip(c, [0, 0], g.computerBoard)
+      g.placeShip(c2, [8, 4], g.computerBoard)
+      g.placeShip(c3, [10, 3], g.computerBoard)
+    })
+    test('Hitting an empty space on the board is a miss', () => {
+      expect(g.receiveAttack([1, 1], g.playerBoard)).toBeFalsy()
+    })
+    test('The miss hit is marked on the corresponding board', () => {
+      g.receiveAttack([1, 1], g.playerBoard)
+      expect(g.playerBoard[1][1]).toEqual(-1)
+    })
+    test('hitting a ship square will causes the ship to be hit on that square', () => {
+      g.receiveAttack([0, 4], g.playerBoard)
+      expect(g.playerBoard[0][4]).toEqual(9)
+    })
+    test('the hit ship will get one if its squares marked', () => {
+      g.receiveAttack([0, 4], g.playerBoard)
+      expect(g.playerShips.at(0).coordinates.at(4).isHit()).toBeTruthy()
+    })
+    test('computer board hits are distinct from playerBoard hits', () => {
+      g.receiveAttack([0, 4], g.playerBoard)
+      expect(g.computerBoard[0][4]).toEqual(1)
+      expect(g.playerBoard[0][4]).toEqual(9)
+    })
+    test('computer ships hit are distinct and calculated separately from player ships', () => {
+      expect(g.computerBoard[9][4]).toEqual(1)
+      g.receiveAttack([9, 4], g.computerBoard) // computer Destroyer (2) hit
+      expect(g.computerBoard[9][4]).toEqual(9)
+      expect(g.playerBoard[9][4]).toEqual(0)
+    })
+  })
 })

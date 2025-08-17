@@ -2,6 +2,7 @@
 // @ts-check
 
 import Ship from "./ship.js"
+import Square from "./square.js"
 import Utils from "./utils.js"
 
 
@@ -19,6 +20,7 @@ class GameBoard {
   #playerBoard
   /** @type {Array<Array>} */
   #computerBoard
+
 
   /**
    * @constructor
@@ -89,7 +91,7 @@ class GameBoard {
       return false;
 
     // if Ship is not initiated with coordinates assign calculated ones
-    if(ship.coordinates.length <= 0){
+    if (ship.coordinates.length <= 0) {
       ship.coordinates = Utils.initCoords(coords);
     }
 
@@ -151,10 +153,61 @@ class GameBoard {
    * @method to receive the attack on the board
    * @param {Array<number>} coords 
    * @param {Array<Array>} board 
+   * @returns {boolean}
    * */
   receiveAttack(coords, board) {
     // TODO: receive an attack on the board and calculate 
-    // hits and misses according to each player
+    // NOTE: misses will be marked on the corresponding board with an -1
+    // NOTE: hits are marked with 9
+    // NOTE: occupied slots are marked with 1
+
+    // case 0: out of bound
+    if (coords[0] < 0
+      || coords[0] > this.#width
+      || coords[1] < 0
+      || coords[1] > this.#height) {
+      return false;
+    }
+
+    // case 1: Missed shot
+    if (board[coords[0]][coords[1]] === 0) {
+      board[coords[0]][coords[1]] = -1
+      return false
+    }
+
+    // case 2: slot occupied
+    if (board[coords[0]][coords[1]] === 1) {
+      // 1. Get the ship that occupies that slot
+      if (board === this.playerBoard) {
+        // player
+        for (let ship of this.#playerShips) {
+          let s = ship.coordinates.find((/**@type {Square} */s) =>
+            s.x === coords[0] && s.y === coords[1]
+          );
+          // 2. And mark its square as hit
+          if (s) {
+            ship.hit(coords)
+            // 3. mark the hit square on the board
+            this.#playerBoard[coords[0]][coords[1]] = 9
+            return true
+          }
+        }
+      } else {
+        // computer
+        for (let ship of this.#computerShips) {
+          let s = ship.coordinates.find((/**@type {Square} */s) =>
+            s.x === coords[0] && s.y === coords[1]
+          );
+          // 2. And mark its square as hit
+          if (s) {
+            ship.hit(coords)
+            // 3. mark the hit square on the board
+            this.#computerBoard[coords[0]][coords[1]] = 9
+            return true
+          }
+        }
+      }
+    }
 
   }
 
