@@ -187,6 +187,7 @@ class GameBoard {
           // 2. And mark its square as hit
           if (s) {
             ship.hit(coords)
+            // console.log(`hitting ship at ${coords}`)
             // 3. mark the hit square on the board
             this.#playerBoard[coords[0]][coords[1]] = 9
             return true
@@ -208,17 +209,18 @@ class GameBoard {
         }
       }
     }
-
   }
 
   /**
    * @method to return whether all the ships have been sunk
-   * @param {*} player - The player whose fleet to be checked 
+   * @param {Array<Ship>} player - The player whose fleet to be checked 
    * @returns {boolean}
    * */
   shipsSunk(player) {
     // TODO: check the player fleet for whether his fleet has been sunk
-    return false;
+    // WARN: using playerShips and computerShips instead of player for now
+    // FIX change them later
+    return player.every((/**@type {Ship} */s) => s.isSunk())
   }
 }
 

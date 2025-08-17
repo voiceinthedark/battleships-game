@@ -124,4 +124,66 @@ describe('Gameboard module tests', () => {
       expect(g.playerBoard[9][4]).toEqual(0)
     })
   })
+
+  describe('shipsSunk method tests', () => {
+    let g;
+    let s 
+    let s2
+    let s3
+    let c 
+    let c2
+    let c3
+    beforeEach(() => {
+      s = new Ship('Carrier', 6, 'horizontal')
+      s2 = new Ship('Destroyer', 5, 'vertical')
+      s3 = new Ship('Gunboat', 2, 'horizontal')
+
+      c = new Ship('Carrier', 6, 'horizontal')
+      c2 = new Ship('Destroyer', 5, 'vertical')
+      c3 = new Ship('Gunboat', 2, 'horizontal')
+
+      g = new GameBoard()
+      g.placeShip(s, [0, 0], g.playerBoard)
+      g.placeShip(s2, [4, 6], g.playerBoard)
+      g.placeShip(s3, [8, 9], g.playerBoard)
+
+      g.placeShip(c, [0, 0], g.computerBoard)
+      g.placeShip(c2, [8, 4], g.computerBoard)
+      g.placeShip(c3, [10, 3], g.computerBoard)
+    })
+    test('if the fleet is sunk method should return true', () => {
+      for (let i = 0; i < s.length; i++) {
+        g.receiveAttack([0, i], g.playerBoard)
+      }
+      for (let i = 0; i < s2.length; i++) {
+        g.receiveAttack([4 + i, 6], g.playerBoard)
+      }
+      for (let i = 0; i < s3.length; i++) {
+        g.receiveAttack([8, 9 + i], g.playerBoard)
+      }
+      expect(g.shipsSunk(g.playerShips)).toBeTruthy()
+    })
+    test('if not all the ships are sunk, the fleet is alive, should return false', () => {
+      for (let i = 0; i < s.length; i++) {
+        g.receiveAttack([0, i], g.playerBoard)
+      }
+      for (let i = 0; i < s2.length; i++) {
+        g.receiveAttack([4 + i, 6], g.playerBoard)
+      }
+      expect(g.shipsSunk(g.playerShips)).toBeFalsy()
+    })
+    test('computer fleet is distinct from player fleet', () => {
+      for (let i = 0; i < s.length; i++) {
+        g.receiveAttack([0, i], g.playerBoard)
+      }
+      for (let i = 0; i < s2.length; i++) {
+        g.receiveAttack([4 + i, 6], g.playerBoard)
+      }
+      for (let i = 0; i < s3.length; i++) {
+        g.receiveAttack([8, 9 + i], g.playerBoard)
+      }
+      expect(g.shipsSunk(g.computerShips)).toBeFalsy()
+    })
+
+  })
 })
