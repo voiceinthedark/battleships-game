@@ -13,6 +13,7 @@ class Utils {
   /**
      * initialize the coordinates into an array of Sqaures
      * @param {Array<Array>} coords 
+     * @returns {Array<Square>}
      * */
   static initCoords(coords) {
     let res = []

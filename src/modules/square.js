@@ -53,6 +53,10 @@ class Square {
   set hit(val){
     this.#hit = val
   }
+
+  get [Symbol.toStringTag](){
+    return `Square { x: ${this.#x}, y: ${this.#y} - isHit: ${this.#hit} }`
+  }
 }
 
 /** @module Square */

@@ -80,10 +80,6 @@ class GameBoard {
    * @returns {boolean}
    * */
   placeShip(ship, start, board) {
-    // TODO: place ship on the coordinates provided with 
-    // the orientation taken into account
-    // WARN: Refactor, too big it will become
-
     if (!this.#checkBoundaries(ship, start, board)) return false
 
     // Check for collision
@@ -92,8 +88,12 @@ class GameBoard {
     if (Utils.isInteresect(coords, board))
       return false;
 
+    // if Ship is not initiated with coordinates assign calculated ones
+    if(ship.coordinates.length <= 0){
+      ship.coordinates = Utils.initCoords(coords);
+    }
+
     // WARN: player board and computer board are distinct
-    // place the ship on the board
     // NOTE Assess where the ship should be located on the board
     // NOTE horizontal on the x axis, i.e the inner array
     // NOTE vertical on the y axis

@@ -1,5 +1,6 @@
 import Ship from "../modules/ship.js";
 import GameBoard from "../modules/gameboard.js"
+import Square from "../modules/square.js";
 
 describe('Gameboard module tests', () => {
   let gameboard;
@@ -61,7 +62,20 @@ describe('Gameboard module tests', () => {
       expect(gameboard.placeShip(s2, [4, 5], gameboard.playerBoard)).toBeTruthy()
       expect(gameboard.playerShips).toHaveLength(2)
     })
+    test('boards are distinct, placing ships in same coordinates on different board is valid', () => {
+      let s = new Ship('t1', 5, 'horizontal')
+      let s2 = new Ship('t2', 3, 'vertical')
 
-
+      expect(gameboard.placeShip(s, [5, 5], gameboard.playerBoard)).toBeTruthy()
+      expect(gameboard.placeShip(s2, [5, 5], gameboard.computerBoard)).toBeTruthy()
+    })
+    test('A generic ship will get assigned its coordinates by placeship method', () => {
+      let s = new Ship('t1', 3, 'horizontal')
+      gameboard.placeShip(s, [5, 5], gameboard.playerBoard);
+      expect(s.coordinates).toHaveLength(3)
+      expect(s.coordinates.at(0)).toBeInstanceOf(Square)
+      expect(s.coordinates.at(0)).toEqual(new Square(5, 5))
+      expect(s.coordinates.at(0)).not.toEqual(new Square(5, 3))
+    })
   })
 })

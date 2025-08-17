@@ -67,6 +67,10 @@ class Ship {
     return this.#coordinates
   }
 
+  get [Symbol.toStringTag](){
+    return `Ship { name: ${this.#name}, length: ${this.#length}, orientation: ${this.#orientation}, coords: ${this.#coordinates} }`
+  }
+
   /**
    * Set the coordinates of the ship
    * @param {Array<Square>} val 
