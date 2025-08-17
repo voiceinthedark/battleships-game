@@ -2,4 +2,4 @@
 
 ## About
 
-A battleship game implementation in vanilla js 
+A battleship game implementation in vanilla javascript

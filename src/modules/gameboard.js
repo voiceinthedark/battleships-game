@@ -34,8 +34,8 @@ class GameBoard {
     this.#computerShips = [] // an array for the computer's Ship objects
     this.#playerBoard = [] // Array of arrays represing the board
     this.#computerBoard = []
-    this.#fillTheBoard(this.#playerBoard)
-    this.#fillTheBoard(this.#computerBoard)
+    Utils.fillTheBoard(this.#playerBoard, this.#height, this.#width)
+    Utils.fillTheBoard(this.#computerBoard, this.#height, this.#width)
   }
 
   get width() {
@@ -60,18 +60,6 @@ class GameBoard {
 
   get computerShips() {
     return this.#computerShips
-  }
-
-  /**
-   * @method helper function to fill the boards and initialize it
-   * @param {Array<Array>} board 
-   * */
-  #fillTheBoard(board) {
-    for (let i = 0; i < this.#height; i++) {
-      let arr = new Array(14);
-      arr = arr.fill(0)
-      board.push(arr)
-    }
   }
 
   /**
@@ -217,7 +205,6 @@ class GameBoard {
    * @returns {boolean}
    * */
   shipsSunk(player) {
-    // TODO: check the player fleet for whether his fleet has been sunk
     // WARN: using playerShips and computerShips instead of player for now
     // FIX change them later
     return player.every((/**@type {Ship} */s) => s.isSunk())

@@ -65,11 +65,25 @@ class Utils {
    * @param {Array<Array>} board 
    * @returns {Array | null}
    * */
-  static pointOfCollision(coords, board){
-    if(!this.isInteresect(coords, board))
+  static pointOfCollision(coords, board) {
+    if (!this.isInteresect(coords, board))
       return null
 
     return coords.filter(c => board[c[0]][c[1]] === 1).pop()
+  }
+
+  /**
+   * @method helper function to fill the boards and initialize it
+   * @param {Array<Array>} board 
+   * @param {number} height 
+   * @param {number} width 
+   * */
+  static fillTheBoard(board, height, width) {
+    for (let i = 0; i < height; i++) {
+      let arr = new Array(width);
+      arr = arr.fill(0)
+      board.push(arr)
+    }
   }
 }
 
