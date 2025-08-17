@@ -76,4 +76,17 @@ describe('Utils helper methods', () => {
       expect(Utils.pointOfCollision(coords2, board)).toBeNull()
     })
   })
+
+  describe('filltheboard method tests', () => {
+    test('filltheboard returns a table of 0 values', () => {
+      let b = []
+      Utils.fillTheBoard(b, 11, 11);
+      expect(b).toHaveLength(11)
+      expect(b.reduce(
+        (bf, bs) => 
+          bf + bs.reduce(
+            (/**@type {number} */a,/**@type {number} */ b) => 
+              a + b, 0), 0)).toBe(0)
+    })
+  })
 })

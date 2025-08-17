@@ -26,7 +26,7 @@ class Utils {
 
   /**
    * helper function to extract coordinates of a ship
-   * @param {Array[number]} point - The starting location of the ship 
+   * @param {Array<number>} point - The starting location of the ship 
    * @param {number} length - the length of the ship
    * @param {string} orientation - the orientation of the ship
    * @returns {Array<Array>}
