@@ -5,7 +5,6 @@
 // import "./styles/solid.min.css";
 // import "./styles/brands.min.css";
 
-import Ship from './modules/ship.js'
 import Utils from './modules/utils.js'
 import Player from './modules/player.js'
 import GameBoard from './modules/gameboard.js'
@@ -39,10 +38,6 @@ Utils.populateBoardRandomly(g, obj, c)
 p.ships = g.playerShips
 c.ships = g.computerShips
 
-// p.printBoard()
-// console.log(p.ships)
-// c.printBoard()
-// console.log(c.ships)
 
 // event loop
 let gameOn = true;
@@ -83,17 +78,17 @@ while (gameOn) {
     console.log(`${c.name} had ${c.ships.filter(s => !s.isSunk()).length} ship(s) left`)
     console.log(`Game finished in ${loops} turns`)
     console.log(`${p.name} board:`)
-    p.printBoard()
+    Utils.printBoard(p.board)
     console.log(`${c.name} board:`)
-    c.printBoard()
+    Utils.printBoard(c.board)
   } else if (g.shipsSunk(c.ships)) {
     gameOn = false
     console.log(`${p.name} wins the game by sinking the entire fleet of ${c.name}`)
     console.log(`${p.name} had ${p.ships.filter(s => !s.isSunk()).length} ship(s) left`)
     console.log(`Game finished in ${loops} turns`)
     console.log(`${p.name} board:`)
-    p.printBoard()
+    Utils.printBoard(p.board)
     console.log(`${c.name} board:`)
-    c.printBoard()
+    Utils.printBoard(c.board)
   }
 }

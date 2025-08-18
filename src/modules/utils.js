@@ -5,13 +5,15 @@ import GameBoard from './gameboard.js'
 import Player from './player.js'
 import Ship from './ship.js'
 import Square from './square.js'
+import format from '@stdlib/string-format'
+import clc from 'cli-color'
 
 /**
  * @class Utils
  * @classdesc helper class
  * */
 class Utils {
-  constructor() {}
+  constructor() { }
   /**
    * initialize the coordinates into an array of Sqaures
    * @param {Array<Array>} coords
@@ -160,6 +162,42 @@ class Utils {
    * */
   static randomNb(min, max) {
     return min + Math.floor(Math.random() * max)
+  }
+
+  /**
+     * @method printBoard to print the player board
+     * @param {Array<Array>} playerBoard 
+     * */
+  static printBoard(playerBoard) {
+    let row = '    '
+    let c = 0
+    // add Header
+    for (let i = 0; i < playerBoard[0].length; i++) {
+      row += format('% 3d  ', i)
+    }
+    row += '\n'
+    row += '    '
+    for (let i = 0; i < playerBoard[0].length; i++) {
+      row += ` ____`
+    }
+    row += '\n'
+    for (let h of playerBoard) {
+      row += format('% 3d|', c++)
+      for (let w of h) {
+        if (w === 1) {
+          row += format(clc.bgGreen('% 3d  '), w)
+        } else if (w === 9) {
+          row += format(clc.bgRed('% 3d  '), w)
+        } else if (w === -1) {
+          row += format(clc.bgYellow('% 3d  '), w)
+        }
+        else {
+          row += format('% 3d  ', w)
+        }
+      }
+      row += '\n'
+    }
+    console.log(row)
   }
 }
 

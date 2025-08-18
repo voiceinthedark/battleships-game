@@ -67,41 +67,7 @@ class Player {
   set turn(val) {
     this.#turn = val
   }
-
-  /**
-   * @method printBoard to print the player board
-   * */
-  printBoard() {
-    let row = '    '
-    let c = 0
-    // add Header
-    for (let i = 0; i < this.board[0].length; i++) {
-      row += format('% 3d  ', i)
-    }
-    row += '\n'
-    row += '    '
-    for (let i = 0; i < this.board[0].length; i++) {
-      row += ` ____`
-    }
-    row += '\n'
-    for (let h of this.board) {
-      row += format('% 3d|', c++)
-      for (let w of h) {
-        if (w === 1) {
-          row += format(clc.bgGreen('% 3d  '), w)
-        } else if (w === 9) {
-          row += format(clc.bgRed('% 3d  '), w)
-        } else if (w === -1) {
-          row += format(clc.bgYellow('% 3d  '), w)
-        }
-        else {
-          row += format('% 3d  ', w)
-        }
-      }
-      row += '\n'
-    }
-    console.log(row)
-  }
+  
 }
 
 /** @module Player */
