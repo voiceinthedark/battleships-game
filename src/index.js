@@ -39,7 +39,61 @@ Utils.populateBoardRandomly(g, obj, c)
 p.ships = g.playerShips
 c.ships = g.computerShips
 
-p.printBoard()
-console.log(p.ships)
-c.printBoard()
-console.log(c.ships)
+// p.printBoard()
+// console.log(p.ships)
+// c.printBoard()
+// console.log(c.ships)
+
+// event loop
+let gameOn = true;
+p.turn = true;
+c.turn = false;
+let coords;
+let hit;
+let loops = 0
+
+while (gameOn) {
+  loops++
+  if (p.turn) {
+    coords = [Math.floor(Math.random() * g.height), Math.floor(Math.random() * g.width)]
+    hit = g.receiveAttack(coords, g.computerBoard)
+    p.turn = false
+    c.turn = true
+    if (hit) {
+      console.log(`${p.name} scored a hit at ${coords}`)
+    } else {
+      console.log(`${p.name} missed at ${coords}`)
+    }
+  }
+  if (c.turn) {
+    coords = [Math.floor(Math.random() * g.height), Math.floor(Math.random() * g.width)]
+    hit = g.receiveAttack(coords, g.playerBoard)
+    c.turn = false
+    p.turn = true
+    if (hit) {
+      console.log(`${c.name} scored a hit at ${coords}`)
+    } else {
+      console.log(`${c.name} missed at ${coords}`)
+    }
+  }
+
+  if (g.shipsSunk(p.ships)) {
+    gameOn = false
+    console.log(`${c.name} wins the game by sinking the entire fleet of ${p.name}`)
+    console.log(`${c.name} had ${c.ships.filter(s => !s.isSunk()).length} ship(s) left`)
+    console.log(`Game finished in ${loops} turns`)
+    console.log(`${p.name} board:`)
+    p.printBoard()
+    console.log(`${c.name} board:`)
+    c.printBoard()
+  } else if (g.shipsSunk(c.ships)) {
+    gameOn = false
+    console.log(`${p.name} wins the game by sinking the entire fleet of ${c.name}`)
+    console.log(`${p.name} had ${p.ships.filter(s => !s.isSunk()).length} ship(s) left`)
+    console.log(`Game finished in ${loops} turns`)
+    console.log(`${p.name} board:`)
+    p.printBoard()
+    console.log(`${c.name} board:`)
+    c.printBoard()
+  }
+}

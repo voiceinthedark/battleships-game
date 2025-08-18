@@ -89,7 +89,12 @@ class Player {
       for (let w of h) {
         if (w === 1) {
           row += format(clc.bgGreen('% 3d  '), w)
-        } else {
+        } else if (w === 9) {
+          row += format(clc.bgRed('% 3d  '), w)
+        } else if (w === -1) {
+          row += format(clc.bgYellow('% 3d  '), w)
+        }
+        else {
           row += format('% 3d  ', w)
         }
       }
