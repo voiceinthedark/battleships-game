@@ -29,7 +29,9 @@ let obj = [
   { length: 4, orientation: 'vertical'},
   { length: 4, orientation: 'horizontal'},
   { length: 3, orientation: 'horizontal'},
-  { length: 3, orientation: 'vertical'}
+  { length: 3, orientation: 'vertical'},
+  { length: 2, orientation: 'vertical'},
+  { length: 2, orientation: 'horizontal'}
 ]
 
 Utils.populateBoardRandomly(g, obj, p)
