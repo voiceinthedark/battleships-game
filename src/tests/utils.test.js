@@ -1,3 +1,5 @@
+import Player from "../modules/player.js"
+import GameBoard from "../modules/gameboard.js"
 import Square from "../modules/square.js"
 import Utils from "../modules/utils.js"
 
@@ -36,8 +38,8 @@ describe('Utils helper methods', () => {
   })
 
   describe('isIntersect method tests', () => {
-    let coords = [[0,3], [0,4], [0,5]]
-    let coords2 = [[0,0], [1,0], [2,0]]
+    let coords = [[0, 3], [0, 4], [0, 5]]
+    let coords2 = [[0, 0], [1, 0], [2, 0]]
     let board = [
       [0, 0, 0, 0, 1, 0, 0],
       [0, 0, 0, 0, 1, 0, 0],
@@ -57,8 +59,8 @@ describe('Utils helper methods', () => {
   })
 
   describe('pointOfCollision method tests', () => {
-    let coords = [[0,3], [0,4], [0,5]]
-    let coords2 = [[0,0], [1,0], [2,0]]
+    let coords = [[0, 3], [0, 4], [0, 5]]
+    let coords2 = [[0, 0], [1, 0], [2, 0]]
     let board = [
       [0, 0, 0, 0, 1, 0, 0],
       [0, 0, 0, 0, 1, 0, 0],
@@ -83,10 +85,37 @@ describe('Utils helper methods', () => {
       Utils.fillTheBoard(b, 11, 11);
       expect(b).toHaveLength(11)
       expect(b.reduce(
-        (bf, bs) => 
+        (bf, bs) =>
           bf + bs.reduce(
-            (/**@type {number} */a,/**@type {number} */ b) => 
+            (/**@type {number} */a,/**@type {number} */ b) =>
               a + b, 0), 0)).toBe(0)
     })
+  })
+
+  describe('populate board randomly tests', () => {
+    let g
+    let player;
+    let computer;
+    let obj
+    beforeEach(() => {
+      g = new GameBoard();
+      player = new Player('player', g.playerBoard);
+      computer = new Player('pc', g.computerBoard)
+      player.ships = g.playerShips
+      computer.ships = g.computerShips
+      obj = [{ length: 6, orientation: "horizontal" },
+      { length: 5, orientation: "vertical" }, { length: 4, orientation: "horizontal" },
+      { length: 3, orientation: "vertical" }, { length: 3, orientation: "horizontal" }]
+    });
+    test('player ships should be 5 after populating the board', () => {
+      expect(player.ships).toHaveLength(0)
+      Utils.populateBoardRandomly(g, obj, player)
+      expect(player.ships).toHaveLength(5)
+    });
+    test('computer board is distinct from player board', () => {
+      expect(computer.ships).toHaveLength(0)
+      Utils.populateBoardRandomly(g, obj, computer)
+      expect(computer.ships).toHaveLength(5)
+    });
   })
 })

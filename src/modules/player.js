@@ -3,7 +3,6 @@
 
 import Ship from "./ship.js";
 
-
 /**
  * @class Player
  * @classdesc Player module
