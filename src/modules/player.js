@@ -3,6 +3,7 @@
 
 import Ship from "./ship.js";
 import format from "@stdlib/string-format"
+import clc from "cli-color"
 
 /**
  * @class Player
@@ -75,23 +76,27 @@ class Player {
     let c = 0
     // add Header
     for (let i = 0; i < this.board[0].length; i++) {
-      row += format('% 3d ', i)
+      row += format('% 3d  ', i)
     }
     row += '\n'
     row += '    '
     for (let i = 0; i < this.board[0].length; i++) {
-      row += ` ___`
+      row += ` ____`
     }
     row += '\n'
     for (let h of this.board) {
       row += format('% 3d|', c++)
       for (let w of h) {
-        row += format('% 3d ', w)
+        if (w === 1) {
+          row += format(clc.bgGreen('% 3d  '), w)
+        }
+        else {
+          row += format('% 3d  ', w)
+        }
       }
       row += '\n'
     }
     console.log(row)
-
   }
 }
 

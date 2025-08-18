@@ -25,7 +25,9 @@ let c = new Player('computer', g.computerBoard)
 let obj = [
   { length: 6, orientation: 'horizontal'},
   { length: 5, orientation: 'vertical'},
+  { length: 5, orientation: 'horizontal'},
   { length: 4, orientation: 'vertical'},
+  { length: 4, orientation: 'horizontal'},
   { length: 3, orientation: 'horizontal'},
   { length: 3, orientation: 'vertical'}
 ]
