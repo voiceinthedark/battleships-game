@@ -121,7 +121,6 @@ class Utils {
       } while (collision); // Keep generating until no collision and within bounds
 
       coords.forEach(c => occupied.add(c.toString())); // Add the new ship's coordinates (as strings) to the occupied set
-      // FIX: set the player attribute instead of playerBoard
       gameboard.placeShip(new Ship('a1', o.length, o.orientation, coords), start, player.board);
     }
 
