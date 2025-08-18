@@ -36,6 +36,10 @@ class Game {
       loops++
       if (this.#player.turn) {
         coords = [Math.floor(Math.random() * this.#gameboard.height), Math.floor(Math.random() * this.#gameboard.width)]
+        // PERF: increase efficiency by double by skipping already missed cells
+        while (this.#computer.board[coords[0]][coords[1]] === -1) {
+          coords = [Math.floor(Math.random() * this.#gameboard.height), Math.floor(Math.random() * this.#gameboard.width)]
+        }
         hit = this.#gameboard.receiveAttack(coords, this.#gameboard.computerBoard)
         this.#player.turn = false
         this.#computer.turn = true
@@ -47,6 +51,9 @@ class Game {
       }
       if (this.#computer.turn) {
         coords = [Math.floor(Math.random() * this.#gameboard.height), Math.floor(Math.random() * this.#gameboard.width)]
+        while (this.#player.board[coords[0]][coords[1]] === -1) {
+          coords = [Math.floor(Math.random() * this.#gameboard.height), Math.floor(Math.random() * this.#gameboard.width)]
+        }
         hit = this.#gameboard.receiveAttack(coords, this.#gameboard.playerBoard)
         this.#computer.turn = false
         this.#player.turn = true
