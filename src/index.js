@@ -5,10 +5,10 @@
 // import "./styles/solid.min.css";
 // import "./styles/brands.min.css";
 
-import Ship from "./modules/ship.js";
-import Utils from "./modules/utils.js";
-import Player from "./modules/player.js";
-import GameBoard from "./modules/gameboard.js";
+import Ship from './modules/ship.js'
+import Utils from './modules/utils.js'
+import Player from './modules/player.js'
+import GameBoard from './modules/gameboard.js'
 
 // const appContainer = document.getElementById("container");
 //
@@ -23,15 +23,15 @@ let p = new Player('player', g.playerBoard)
 let c = new Player('computer', g.computerBoard)
 
 let obj = [
-  { length: 6, orientation: 'horizontal'},
-  { length: 5, orientation: 'vertical'},
-  { length: 5, orientation: 'horizontal'},
-  { length: 4, orientation: 'vertical'},
-  { length: 4, orientation: 'horizontal'},
-  { length: 3, orientation: 'horizontal'},
-  { length: 3, orientation: 'vertical'},
-  { length: 2, orientation: 'vertical'},
-  { length: 2, orientation: 'horizontal'}
+  { length: 6, orientation: 'horizontal' },
+  { length: 5, orientation: 'vertical' },
+  { length: 5, orientation: 'horizontal' },
+  { length: 4, orientation: 'vertical' },
+  { length: 4, orientation: 'horizontal' },
+  { length: 3, orientation: 'horizontal' },
+  { length: 3, orientation: 'vertical' },
+  { length: 2, orientation: 'vertical' },
+  { length: 2, orientation: 'horizontal' },
 ]
 
 Utils.populateBoardRandomly(g, obj, p)

@@ -1,8 +1,8 @@
 // ship.js
 // @ts-check
 
-import Square from "./square.js"
-import Utils from "./utils.js"
+import Square from './square.js'
+import Utils from './utils.js'
 
 /**
  * @class
@@ -23,7 +23,7 @@ class Ship {
    * @param {string} name - name of the ship (Carrier, battleship etc.)
    * @param {number} length - length of the ship, how many squares it occupies
    * @param {string} [orientation='horizontal'] - orientation of the ship (default: horizontal)
-   * @param {Array[]} [coordinates=[]] - coordinates of the ship on the board 
+   * @param {Array[]} [coordinates=[]] - coordinates of the ship on the board
    * */
   constructor(name, length, orientation = 'horizontal', coordinates = []) {
     this.#name = name
@@ -67,13 +67,13 @@ class Ship {
     return this.#coordinates
   }
 
-  get [Symbol.toStringTag](){
+  get [Symbol.toStringTag]() {
     return `Ship { name: ${this.#name}, length: ${this.#length}, orientation: ${this.#orientation}, coords: ${this.#coordinates} }`
   }
 
   /**
    * Set the coordinates of the ship
-   * @param {Array<Square>} val 
+   * @param {Array<Square>} val
    * */
   set coordinates(val) {
     this.#coordinates = val
@@ -85,13 +85,14 @@ class Ship {
    * @returns {boolean}
    * */
   hit(coords = []) {
-    if(coords.length <= 0) return false;
+    if (coords.length <= 0) return false
     let idx = this.#coordinates.findIndex(
-      (s) => s.x === coords[0] && s.y === coords[1])
+      (s) => s.x === coords[0] && s.y === coords[1]
+    )
     if (idx >= 0 && !this.coordinates[idx].isHit()) {
       this.#coordinates[idx].hit = true // set the hit property of the square
-      this.#hits++;
-      return true;
+      this.#hits++
+      return true
     }
     return false
   }
@@ -101,11 +102,10 @@ class Ship {
    * @returns {boolean}
    * */
   isSunk() {
-    if (this.#hits < this.#length)
-      return false
+    if (this.#hits < this.#length) return false
     return true
   }
 }
 
 /**@module Ship */
-export default Ship;
+export default Ship

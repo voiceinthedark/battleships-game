@@ -1,10 +1,9 @@
 // gameboard.js
 // @ts-check
 
-import Ship from "./ship.js"
-import Square from "./square.js"
-import Utils from "./utils.js"
-
+import Ship from './ship.js'
+import Square from './square.js'
+import Utils from './utils.js'
 
 /**
  * @class GameBoard
@@ -21,15 +20,14 @@ class GameBoard {
   /** @type {Array<Array>} */
   #computerBoard
 
-
   /**
    * @constructor
-   * @param {number} [height=14] height of the board (default 14) 
+   * @param {number} [height=14] height of the board (default 14)
    * @param {number} [width=14] width of the board (default 14)
    * */
   constructor(height = 14, width = 14) {
-    this.#height = height;
-    this.#width = width;
+    this.#height = height
+    this.#width = width
     this.#playerShips = [] // an array containing a list of Ship objects
     this.#computerShips = [] // an array for the computer's Ship objects
     this.#playerBoard = [] // Array of arrays represing the board
@@ -64,8 +62,8 @@ class GameBoard {
 
   /**
    * @method to place the ship on the board
-   * @param {Ship} ship 
-   * @param {Array<number>} start - start between 0 and width or height - length 
+   * @param {Ship} ship
+   * @param {Array<number>} start - start between 0 and width or height - length
    * @param {Array<Array>} board - The board where the ship should be placed (computer or player)
    * @returns {boolean}
    * */
@@ -74,13 +72,16 @@ class GameBoard {
 
     // Check for collision
     // WARNING: Take care that ships can't overlap
-    let coords = Utils.getCoordinatesFromPoint(start, ship.length, ship.orientation)
-    if (Utils.isInteresect(coords, board))
-      return false;
+    let coords = Utils.getCoordinatesFromPoint(
+      start,
+      ship.length,
+      ship.orientation
+    )
+    if (Utils.isInteresect(coords, board)) return false
 
     // if Ship is not initiated with coordinates assign calculated ones
     if (ship.coordinates.length <= 0) {
-      ship.coordinates = Utils.initCoords(coords);
+      ship.coordinates = Utils.initCoords(coords)
     }
 
     // WARN: player board and computer board are distinct
@@ -113,14 +114,14 @@ class GameBoard {
       // NOTE: add ship to computer's fleet
       this.#computerShips.push(ship)
     }
-    return true;
+    return true
   }
 
   /**
    * helper method to check if the ship falls into boundary
-   * @param {Ship} ship 
-   * @param {Array<number>} start 
-   * @param {Array<Array>} board 
+   * @param {Ship} ship
+   * @param {Array<number>} start
+   * @param {Array<Array>} board
    * */
   #checkBoundaries(ship, start, board) {
     if (ship.orientation === 'horizontal') {
@@ -139,22 +140,24 @@ class GameBoard {
 
   /**
    * @method to receive the attack on the board
-   * @param {Array<number>} coords 
-   * @param {Array<Array>} board 
+   * @param {Array<number>} coords
+   * @param {Array<Array>} board
    * @returns {boolean}
    * */
   receiveAttack(coords, board) {
-    // TODO: receive an attack on the board and calculate 
+    // TODO: receive an attack on the board and calculate
     // NOTE: misses will be marked on the corresponding board with an -1
     // NOTE: hits are marked with 9
     // NOTE: occupied slots are marked with 1
 
     // case 0: out of bound
-    if (coords[0] < 0
-      || coords[0] > this.#width
-      || coords[1] < 0
-      || coords[1] > this.#height) {
-      return false;
+    if (
+      coords[0] < 0 ||
+      coords[0] > this.#width ||
+      coords[1] < 0 ||
+      coords[1] > this.#height
+    ) {
+      return false
     }
 
     // case 1: Missed shot
@@ -169,9 +172,9 @@ class GameBoard {
       if (board === this.playerBoard) {
         // player
         for (let ship of this.#playerShips) {
-          let s = ship.coordinates.find((/**@type {Square} */s) =>
-            s.x === coords[0] && s.y === coords[1]
-          );
+          let s = ship.coordinates.find(
+            (/**@type {Square} */ s) => s.x === coords[0] && s.y === coords[1]
+          )
           // 2. And mark its square as hit
           if (s) {
             ship.hit(coords)
@@ -184,9 +187,9 @@ class GameBoard {
       } else {
         // computer
         for (let ship of this.#computerShips) {
-          let s = ship.coordinates.find((/**@type {Square} */s) =>
-            s.x === coords[0] && s.y === coords[1]
-          );
+          let s = ship.coordinates.find(
+            (/**@type {Square} */ s) => s.x === coords[0] && s.y === coords[1]
+          )
           // 2. And mark its square as hit
           if (s) {
             ship.hit(coords)
@@ -201,15 +204,15 @@ class GameBoard {
 
   /**
    * @method to return whether all the ships have been sunk
-   * @param {Array<Ship>} player - The player whose fleet to be checked 
+   * @param {Array<Ship>} player - The player whose fleet to be checked
    * @returns {boolean}
    * */
   shipsSunk(player) {
     // WARN: using playerShips and computerShips instead of player for now
     // FIX change them later
-    return player.every((/**@type {Ship} */s) => s.isSunk())
+    return player.every((/**@type {Ship} */ s) => s.isSunk())
   }
 }
 
 /** @module GameBoard */
-export default GameBoard;
+export default GameBoard

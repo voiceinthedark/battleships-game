@@ -6,16 +6,13 @@
  * @classdesc App controller, to control the flow of data between the front and the back
  * */
 class AppController {
-
   /**
    * @param {HTMLElement} appContainer
    * */
-  constructor(appContainer) {
-  }
-  
+  constructor(appContainer) {}
 }
 
 /**
  * @module AppController
  * */
-export default AppController;
+export default AppController

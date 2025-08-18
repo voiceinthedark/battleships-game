@@ -1,27 +1,27 @@
 @font-face {
-  font-family: "lato";
+  font-family: 'lato';
   src:
-    url("../assets/fonts/Lato-Regular.ttf") format("truetype"),
-    url("../assets/fonts/Lato-Bold.ttf") format("truetype"),
-    url("../assets/fonts/Lato-Italic.ttf") format("truetype");
+    url('../assets/fonts/Lato-Regular.ttf') format('truetype'),
+    url('../assets/fonts/Lato-Bold.ttf') format('truetype'),
+    url('../assets/fonts/Lato-Italic.ttf') format('truetype');
   font-weight: 400, 700, 400;
   font-style: normal, normal, italic;
 }
 
 @font-face {
-  font-family: "Font Awesome 6 Free";
-  src: url("../assets/fonts/fa-solid-900.ttf") format("truetype");
+  font-family: 'Font Awesome 6 Free';
+  src: url('../assets/fonts/fa-solid-900.ttf') format('truetype');
   font-weight: 900;
   font-style: normal;
 }
 
 @font-face {
-  font-family: "Montserrat";
+  font-family: 'Montserrat';
   src:
-    url("../assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf")
-      format("truetype"),
-    url("../assets/fonts/Montserrat/Montserrat-Italic-VariableFont_wght.ttf")
-      format("truetype");
+    url('../assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf')
+      format('truetype'),
+    url('../assets/fonts/Montserrat/Montserrat-Italic-VariableFont_wght.ttf')
+      format('truetype');
   font-weight: 100 900;
   font-style: normal, italic;
 }
@@ -45,7 +45,7 @@ body {
   padding: 0;
   height: 100vh;
   color: var(--color-main);
-  font-family: "lato", sans-serif;
+  font-family: 'lato', sans-serif;
   font-size: 16px;
   display: flex;
   flex-direction: column;

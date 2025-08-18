@@ -48,16 +48,16 @@ class Square {
 
   /**
    * Set the hit property of the square
-   * @param {boolean} val 
+   * @param {boolean} val
    * */
-  set hit(val){
+  set hit(val) {
     this.#hit = val
   }
 
-  get [Symbol.toStringTag](){
+  get [Symbol.toStringTag]() {
     return `Square { x: ${this.#x}, y: ${this.#y} - isHit: ${this.#hit} }`
   }
 }
 
 /** @module Square */
-export default Square;
+export default Square

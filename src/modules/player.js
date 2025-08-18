@@ -1,9 +1,9 @@
 // player.js
 // @ts-check
 
-import Ship from "./ship.js";
-import format from "@stdlib/string-format"
-import clc from "cli-color"
+import Ship from './ship.js'
+import format from '@stdlib/string-format'
+import clc from 'cli-color'
 
 /**
  * @class Player
@@ -11,18 +11,18 @@ import clc from "cli-color"
  * */
 class Player {
   /**@type {string} */
-  #name;
+  #name
   /**@type {Array<Array>} */
-  #board;
+  #board
   /** @type {Array<Ship>} */
-  #ships;
+  #ships
   /**@type {boolean} */
-  #turn;
+  #turn
 
   /**
    * @constructor
    * @param {string} name
-   * @param {Array<Array>} board 
+   * @param {Array<Array>} board
    * */
   constructor(name, board) {
     this.#name = name
@@ -38,7 +38,7 @@ class Player {
   }
   /**
    * Set the board of the player
-   * @param {Array<Array>} val 
+   * @param {Array<Array>} val
    * */
   set board(val) {
     this.#board = val
@@ -50,7 +50,7 @@ class Player {
 
   /**
    * Set the player ships
-   * @param {Array<Ship>} val 
+   * @param {Array<Ship>} val
    * */
   set ships(val) {
     this.#ships = val
@@ -62,7 +62,7 @@ class Player {
 
   /**
    * Set the turn of the player
-   * @param {boolean} val 
+   * @param {boolean} val
    * */
   set turn(val) {
     this.#turn = val
@@ -89,8 +89,7 @@ class Player {
       for (let w of h) {
         if (w === 1) {
           row += format(clc.bgGreen('% 3d  '), w)
-        }
-        else {
+        } else {
           row += format('% 3d  ', w)
         }
       }
@@ -101,4 +100,4 @@ class Player {
 }
 
 /** @module Player */
-export default Player;
+export default Player
