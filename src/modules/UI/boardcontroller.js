@@ -23,7 +23,7 @@ class BoardController {
   /**
    * @method renderBoard to display the board on screen
    * @param {Player} player - the board to display, player or computer 
-   * @callback handleclick - callback method to apply on each square of the board
+   * @param {Function} handleclick - callback method to apply on each square of the board
    * */
   renderBoard(player, handleclick) {
     let boardContainer = this.#uimanager.addElement('div', this.#uimanager.container, 'board-container')
@@ -35,13 +35,15 @@ class BoardController {
       for(let j = 0; j < player.board[i].length; j++){
         let boardCell = this.#uimanager.addElement('div', boardPlayer, 'board-cell')
         boardCell.dataset.id = `${i},${j}`
-        if(player.board[i][j] === 1){
+        if(player.board[i][j] === 1 && player.name === 'player'){
           boardCell.style.backgroundColor = 'green'
         } 
         if(player.board[i][j] === 9){
           boardCell.style.backgroundColor = 'red'
         }
 
+        // Add event listener on the cell 
+        boardCell.addEventListener('click', handleclick)
       }
     }
 

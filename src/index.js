@@ -46,6 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function runApp() {
     const appcontroller = new AppController(appContainer)
     appcontroller.setBoard(p)
+    // TODO: show setup pane during game setup, then replace it with computer board
+    appcontroller.setBoard(c)
   }
 
   runApp();

@@ -21,13 +21,34 @@ class AppController {
   }
 
   /**
+   * Set the initial pane to setup the pieces on the board and start the game
+   *
+   * */
+  setControlPane(){
+
+
+  }
+
+  /**
    * Set the board on the page
    * @param {Player} player 
    * */
   setBoard(player){
     const board = new BoardController(this.#uimanager)
-    const boardUI = board.renderBoard(player, () => {})
+    const boardUI = board.renderBoard(player, this.handleCellClick.bind(this))
     this.#appContainer.appendChild(boardUI)
+  }
+
+  /**
+   * Handle the cell click on the board
+   * @param {Event} e 
+   * */
+  handleCellClick(e){
+    // NOTE: need to control where the user clicks
+    // TODO: The user is only allowed to click his own board at setup
+    // WARN: disable clicking the cells after initial game setup
+    e.preventDefault()
+    console.log(`${e.target.dataset.id}`)
   }
 }
 

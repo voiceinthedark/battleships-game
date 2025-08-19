@@ -86,4 +86,16 @@ body {
     }
   }
 
+  .control-container{
+    display: grid;
+    grid-template-columns: 4fr 2fr;
+
+    /** LEFT SIDE OF THE CONTROL */
+    .control-pieces{
+      display: grid;
+      grid-template-columns: 2fr 2fr;
+
+    }
+  }
+
 }
