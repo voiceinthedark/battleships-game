@@ -2,8 +2,6 @@
 // @ts-check
 
 import Ship from './ship.js'
-import format from '@stdlib/string-format'
-import clc from 'cli-color'
 
 /**
  * @class Player

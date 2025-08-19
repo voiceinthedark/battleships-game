@@ -6,7 +6,7 @@ import Player from './player.js'
 import Ship from './ship.js'
 import Square from './square.js'
 import format from '@stdlib/string-format'
-import clc from 'cli-color'
+// import clc from 'cli-color'
 
 /**
  * @class Utils
@@ -184,16 +184,16 @@ class Utils {
     for (let h of playerBoard) {
       row += format('% 3d|', c++)
       for (let w of h) {
-        if (w === 1) {
-          row += format(clc.bgGreen('% 3d  '), w)
-        } else if (w === 9) {
-          row += format(clc.bgRed('% 3d  '), w)
-        } else if (w === -1) {
-          row += format(clc.bgYellow('% 3d  '), w)
-        }
-        else {
+        // if (w === 1) {
+        //   row += format(clc.bgGreen('% 3d  '), w)
+        // } else if (w === 9) {
+        //   row += format(clc.bgRed('% 3d  '), w)
+        // } else if (w === -1) {
+        //   row += format(clc.bgYellow('% 3d  '), w)
+        // }
+        // else {
           row += format('% 3d  ', w)
-        }
+        // }
       }
       row += '\n'
     }

@@ -1,5 +1,5 @@
-// import AppController from "modules/appcontroller.js";
-// import "./styles/styles.css";
+import AppController from "./modules/appcontroller.js";
+import "./styles/styles.css"
 // import "./styles/fontawesome.min.css";
 // import "./styles/regular.min.css";
 // import "./styles/solid.min.css";
@@ -10,13 +10,7 @@ import Player from './modules/player.js'
 import GameBoard from './modules/gameboard.js'
 import Game from './modules/game.js'
 
-// const appContainer = document.getElementById("container");
-//
-// async function runApp() {
-//
-// }
-//
-// runApp();
+
 
 let g = new GameBoard()
 let p = new Player('player', g.playerBoard)
@@ -40,5 +34,20 @@ Utils.populateBoardRandomly(g, obj, c)
 p.ships = g.playerShips
 c.ships = g.computerShips
 
-game.run()
+// game.run()
+document.addEventListener('DOMContentLoaded', () => {
+  const appContainer = document.getElementById("container");
+
+  if (!appContainer) {
+    console.error("Error: HTML element with ID 'container' not found. Ensure your HTML has an element like <div id=\"container\"></div>.");
+    return;
+  }
+
+  function runApp() {
+    const appcontroller = new AppController(appContainer)
+    appcontroller.setBoard(p)
+  }
+
+  runApp();
+});
 

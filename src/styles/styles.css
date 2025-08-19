@@ -50,3 +50,40 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+.header{
+  font-family: 'Montserrat', sans-serif;
+  font-size: 150%;
+}
+
+.container{
+  display: grid;
+  grid-template-columns: 6fr 6fr;
+
+  .board-container{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+
+    .board-name{
+      font-size: 130%;
+      font-weight: bold;
+    }
+
+    .board-player{
+      display: grid;
+      grid-template-columns: repeat(14, 1fr);
+      /* justify-items: center; */
+      align-content: end;
+
+      .board-cell{
+        height: 50px;
+        width: 50px;
+        border: 1px solid black;
+      }
+    }
+  }
+
+}
