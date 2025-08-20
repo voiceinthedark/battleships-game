@@ -20,8 +20,9 @@ class OptionsPane {
 
   /**
    * @method renderPane to render the command pane on the page
+   * @param {Function} handleRotationCommand 
    * */
-  renderPane() {
+  renderPane(handleRotationCommand) {
     const commandPane = document.createElement('div')
     commandPane.classList.add('command-pane')
 
@@ -30,6 +31,7 @@ class OptionsPane {
 
     const rotateCommand = this.#uimanager.addElement('button', commandPane, 'command-rotate')
     rotateCommand.textContent = 'Rotate Pieces'
+    rotateCommand.addEventListener('click', handleRotationCommand)
 
     const resetCommand = this.#uimanager.addElement('button', commandPane, 'command-reset')
     resetCommand.textContent = "Reset Pieces"

@@ -42,10 +42,15 @@ class PiecesPane {
       if (orientation === 'horizontal') {
         piece.style.height = '50px'
         piece.style.width = `${50 * p.length}px`
+        controlPieces.classList.remove('control-pieces-vertical')
+        controlPieces.classList.add('control-pieces')
       }
       if (orientation === 'vertical') {
         piece.style.height = `${50 * p.length}px`
         piece.style.width = '50px'
+        // change the grid to 4 fractions
+        controlPieces.classList.remove('control-pieces')
+        controlPieces.classList.add('control-pieces-vertical')
       }
       piece.style.backgroundColor = 'green'
       piece.style.border = '2px solid black'

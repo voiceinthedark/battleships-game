@@ -21,9 +21,10 @@ class ControlPane{
    * @param {Object[]} pieces 
    * @param {number} pieces[].length
    * @param {string} pieces[].orientation
+   * @param {Function} handleRotationCommand 
    * @returns {HTMLElement} the control pane element
    * */
-  renderControlPane(pieces){
+  renderControlPane(pieces, handleRotationCommand){
     const controlContainer = document.createElement('div')
     controlContainer.classList.add('control-container')
 
@@ -33,7 +34,7 @@ class ControlPane{
     controlContainer.appendChild(ppane)
 
     const commandPane = new OptionsPane(this.#uimanager)
-    const options = commandPane.renderPane()
+    const options = commandPane.renderPane(handleRotationCommand)
     controlContainer.appendChild(options)
 
     return controlContainer

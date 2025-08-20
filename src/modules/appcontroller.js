@@ -4,6 +4,7 @@
 import Player from "./player.js"
 import BoardController from "./UI/boardcontroller.js"
 import ControlPane from "./UI/controlPane.js"
+import PiecesPane from "./UI/piecespane.js"
 import UIManager from "./UI/uimanager.js"
 
 /**
@@ -25,9 +26,10 @@ class AppController {
    * Set the initial pane to setup the pieces on the board and start the game
    * @param {Object[]} pieces 
    * */
-  setControlPane(pieces){
+  setControlPane(pieces) {
     const controlPane = new ControlPane(this.#uimanager)
-    const element = controlPane.renderControlPane(pieces)
+    const element = controlPane.renderControlPane(pieces,
+      (/**@type {Event} */e) => this.handleRotationCommand(e, pieces))
     this.#appContainer.appendChild(element)
   }
 
@@ -35,7 +37,7 @@ class AppController {
    * Set the board on the page
    * @param {Player} player 
    * */
-  setBoard(player){
+  setBoard(player) {
     const board = new BoardController(this.#uimanager)
     const boardUI = board.renderBoard(player, this.handleCellClick.bind(this))
     this.#appContainer.appendChild(boardUI)
@@ -45,12 +47,35 @@ class AppController {
    * Handle the cell click on the board
    * @param {Event} e 
    * */
-  handleCellClick(e){
+  handleCellClick(e) {
     // NOTE: need to control where the user clicks
     // TODO: The user is only allowed to click his own board at setup
     // WARN: disable clicking the cells after initial game setup
     e.preventDefault()
     console.log(`${e.target.dataset.id}`)
+  }
+
+  /**
+   * @method handleRotationCommand to handle the rotation of the pieces on the board
+   * @param {Event} e 
+   * @param {Object[]} pieces 
+    * */
+  handleRotationCommand(e, pieces) {
+    e.preventDefault()
+    console.log('rotation clicked');
+    console.log(pieces);
+    let orientation;
+    if (pieces[0].orientation === 'horizontal') {
+      orientation = 'vertical'
+    } else if(pieces[0].orientation === 'vertical'){
+      orientation = 'horizontal'
+    }
+    pieces.map(p => p.orientation = orientation)
+    const piecesPane = new PiecesPane(this.#uimanager)
+    const controlContainer = document.querySelector('.control-container')
+    const oldPane = document.querySelector('.control-pieces-section')
+    const ppane = piecesPane.renderPane(pieces, orientation)
+    controlContainer.replaceChild(ppane, oldPane)
   }
 }
 
