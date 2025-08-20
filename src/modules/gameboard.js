@@ -60,6 +60,18 @@ class GameBoard {
     return this.#computerShips
   }
 
+  resetPlayerBoard(){
+    this.#playerBoard = []
+    Utils.fillTheBoard(this.#playerBoard, this.#height, this.#width)
+    this.#playerShips = []
+  }
+
+  resetComputerBoard(){
+    this.#computerBoard = []
+    Utils.fillTheBoard(this.#computerBoard, this.#height, this.#width)
+    this.#computerShips = []
+  }
+
   /**
    * @method to place the ship on the board
    * @param {Ship} ship

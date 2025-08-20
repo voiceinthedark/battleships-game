@@ -23,14 +23,19 @@ class BoardController {
   /**
    * @method renderBoard to display the board on screen
    * @param {Player} player - the board to display, player or computer 
-   * @param {Function} handleclick - callback method to apply on each square of the board
+   * @param {(event: Event) => void} handleclick - callback method to apply on each square of the board
    * */
   renderBoard(player, handleclick) {
-    let boardContainer = this.#uimanager.addElement('div', this.#uimanager.container, 'board-container')
+    let boardContainer = document.createElement('div')
+    boardContainer.classList.add('board-container')
     let nameSpan = this.#uimanager.addElement('span', boardContainer, 'board-name')
     nameSpan.textContent = `${player.name}`
 
     let boardPlayer = this.#uimanager.addElement('div', boardContainer, 'board-player');
+    if(player.name === 'computer'){
+      boardPlayer.classList.remove('board-player')
+      boardPlayer.classList.add('board-computer')
+    }
     for(let i = 0; i < player.board.length; i++){
       for(let j = 0; j < player.board[i].length; j++){
         let boardCell = this.#uimanager.addElement('div', boardPlayer, 'board-cell')

@@ -1,6 +1,7 @@
 // appcontroller.js
 // @ts-check
 
+import GameBoard from "./gameboard.js"
 import Player from "./player.js"
 import BoardController from "./UI/boardcontroller.js"
 import ControlPane from "./UI/controlPane.js"
@@ -25,13 +26,16 @@ class AppController {
 
   /**
    * Set the initial pane to setup the pieces on the board and start the game
+   * @param {GameBoard} gameboard 
    * @param {Object[]} pieces 
+   * @param {Player} player 
+   * @param {Player} computer 
    * */
-  setControlPane(pieces) {
+  setControlPane(gameboard, pieces, player, computer) {
     const controlPane = new ControlPane(this.#uimanager)
     const element = controlPane.renderControlPane(pieces,
       (/**@type {Event} */e) => this.handleRotationCommand(e, pieces),
-    (/**@type {Event} */e) => this.handleRandomCommand(e, pieces))
+      (/**@type {Event} */e) => this.handleRandomCommand(e, gameboard, pieces, player, computer))
     this.#appContainer.appendChild(element)
   }
 
@@ -67,7 +71,7 @@ class AppController {
     let orientation;
     if (pieces[0].orientation === 'horizontal') {
       orientation = 'vertical'
-    } else if(pieces[0].orientation === 'vertical'){
+    } else if (pieces[0].orientation === 'vertical') {
       orientation = 'horizontal'
     }
     pieces.map(p => p.orientation = orientation)
@@ -81,14 +85,38 @@ class AppController {
   /**
    * @method handleRandomCommand to handle the random placement command
    * @param {Event} e 
+   * @param {GameBoard} gameboard 
    * @param {Object[]} pieces 
+   * @param {Player} player 
+   * @param {Player} computer 
    * */
-  handleRandomCommand(e, pieces){
+  handleRandomCommand(e, gameboard, pieces, player, computer) {
     e.preventDefault()
-    console.log('random')
-    // TODO: randomize the orientation of the pieces then place the pieces randomly
+    // clear all the boards
+    const oldBoards = document.querySelectorAll('.board-container')
+    oldBoards.forEach(board => board.remove())
+    gameboard.resetPlayerBoard()
+    gameboard.resetComputerBoard()
+
+    player.board = gameboard.playerBoard
+    computer.board = gameboard.computerBoard
+
+    // player.ships = []
+    // computer.ships = []
     Utils.randomizeOrientation(pieces)
-    console.log(pieces)
+    Utils.populateBoardRandomly(gameboard, pieces, player)
+    Utils.randomizeOrientation(pieces)
+    Utils.populateBoardRandomly(gameboard, pieces, computer)
+    player.ships = gameboard.playerShips
+    computer.ships = gameboard.computerShips
+
+
+    // const oldBoard = document.querySelector('.board-container')
+    const control = document.querySelector('.control-container')
+    const bController = new BoardController(this.#uimanager)
+    const newBoard = bController.renderBoard(player, this.handleCellClick.bind(this))
+
+    control.before(newBoard)
   }
 }
 

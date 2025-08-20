@@ -29,10 +29,10 @@ let obj = [
   { length: 2, orientation: 'horizontal' },
 ]
 
-Utils.populateBoardRandomly(g, obj, p)
-Utils.populateBoardRandomly(g, obj, c)
-p.ships = g.playerShips
-c.ships = g.computerShips
+// Utils.populateBoardRandomly(g, obj, p)
+// Utils.populateBoardRandomly(g, obj, c)
+// p.ships = g.playerShips
+// c.ships = g.computerShips
 
 // game.run()
 document.addEventListener('DOMContentLoaded', () => {
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const appcontroller = new AppController(appContainer)
     appcontroller.setBoard(p)
     // TODO: show setup pane during game setup, then replace it with computer board
-    appcontroller.setControlPane(obj)
+    appcontroller.setControlPane(g, obj, p, c)
     // appcontroller.setBoard(c)
   }
 
