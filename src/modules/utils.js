@@ -199,6 +199,18 @@ class Utils {
     }
     console.log(row)
   }
+
+  /**
+   * Helper method to randomiz the orientation of pieces
+   * @param {Object[]} pieces 
+   * @param {number} pieces[].length
+   * @param {string} pieces[].orientation
+   * */
+  static randomizeOrientation(pieces){
+    pieces.map(p => {
+      p.orientation = this.randomNb(0, 15) >= 7 ? 'horizontal' : 'vertical'
+    })
+  }
 }
 
 export default Utils

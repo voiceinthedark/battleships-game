@@ -20,9 +20,10 @@ class OptionsPane {
 
   /**
    * @method renderPane to render the command pane on the page
-   * @param {Function} handleRotationCommand 
+   * @param {(event: Event) => void} handleRotationCommand
+   * @param {(even: Event) => void} handleRandomCommand 
    * */
-  renderPane(handleRotationCommand) {
+  renderPane(handleRotationCommand, handleRandomCommand) {
     const commandPane = document.createElement('div')
     commandPane.classList.add('command-pane')
 
@@ -32,6 +33,10 @@ class OptionsPane {
     const rotateCommand = this.#uimanager.addElement('button', commandPane, 'command-rotate')
     rotateCommand.textContent = 'Rotate Pieces'
     rotateCommand.addEventListener('click', handleRotationCommand)
+
+    const randomCommand = this.#uimanager.addElement('button', commandPane, 'command-random')
+    randomCommand.textContent = 'Random Placement'
+    randomCommand.addEventListener('click', handleRandomCommand)
 
     const resetCommand = this.#uimanager.addElement('button', commandPane, 'command-reset')
     resetCommand.textContent = "Reset Pieces"

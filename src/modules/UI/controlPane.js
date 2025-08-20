@@ -5,14 +5,14 @@ import OptionsPane from "./optionspane.js"
 import PiecesPane from "./piecespane.js"
 import UIManager from "./uimanager.js"
 
-class ControlPane{
+class ControlPane {
   #uimanager
 
   /**
    * @constructor
    * @param {UIManager} uimanager 
    * */
-  constructor(uimanager){
+  constructor(uimanager) {
     this.#uimanager = uimanager
   }
 
@@ -21,10 +21,11 @@ class ControlPane{
    * @param {Object[]} pieces 
    * @param {number} pieces[].length
    * @param {string} pieces[].orientation
-   * @param {Function} handleRotationCommand 
+   * @param {(event: Event) => void} handleRotationCommand 
+   * @param {(event: Event) => void} handleRandomCommand 
    * @returns {HTMLElement} the control pane element
    * */
-  renderControlPane(pieces, handleRotationCommand){
+  renderControlPane(pieces, handleRotationCommand, handleRandomCommand) {
     const controlContainer = document.createElement('div')
     controlContainer.classList.add('control-container')
 
@@ -34,7 +35,8 @@ class ControlPane{
     controlContainer.appendChild(ppane)
 
     const commandPane = new OptionsPane(this.#uimanager)
-    const options = commandPane.renderPane(handleRotationCommand)
+    const options = commandPane.renderPane(handleRotationCommand,
+      handleRandomCommand)
     controlContainer.appendChild(options)
 
     return controlContainer

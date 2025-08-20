@@ -6,6 +6,7 @@ import BoardController from "./UI/boardcontroller.js"
 import ControlPane from "./UI/controlPane.js"
 import PiecesPane from "./UI/piecespane.js"
 import UIManager from "./UI/uimanager.js"
+import Utils from "./utils.js"
 
 /**
  * @class
@@ -29,7 +30,8 @@ class AppController {
   setControlPane(pieces) {
     const controlPane = new ControlPane(this.#uimanager)
     const element = controlPane.renderControlPane(pieces,
-      (/**@type {Event} */e) => this.handleRotationCommand(e, pieces))
+      (/**@type {Event} */e) => this.handleRotationCommand(e, pieces),
+    (/**@type {Event} */e) => this.handleRandomCommand(e, pieces))
     this.#appContainer.appendChild(element)
   }
 
@@ -62,8 +64,6 @@ class AppController {
     * */
   handleRotationCommand(e, pieces) {
     e.preventDefault()
-    console.log('rotation clicked');
-    console.log(pieces);
     let orientation;
     if (pieces[0].orientation === 'horizontal') {
       orientation = 'vertical'
@@ -76,6 +76,19 @@ class AppController {
     const oldPane = document.querySelector('.control-pieces-section')
     const ppane = piecesPane.renderPane(pieces, orientation)
     controlContainer.replaceChild(ppane, oldPane)
+  }
+
+  /**
+   * @method handleRandomCommand to handle the random placement command
+   * @param {Event} e 
+   * @param {Object[]} pieces 
+   * */
+  handleRandomCommand(e, pieces){
+    e.preventDefault()
+    console.log('random')
+    // TODO: randomize the orientation of the pieces then place the pieces randomly
+    Utils.randomizeOrientation(pieces)
+    console.log(pieces)
   }
 }
 
