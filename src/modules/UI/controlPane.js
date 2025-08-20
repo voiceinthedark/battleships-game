@@ -1,6 +1,7 @@
 // controlPane.js
 // @ts-check
 
+import OptionsPane from "./optionspane.js"
 import PiecesPane from "./piecespane.js"
 import UIManager from "./uimanager.js"
 
@@ -31,7 +32,9 @@ class ControlPane{
     const ppane = piecesPane.renderPane(pieces, 'horizontal');
     controlContainer.appendChild(ppane)
 
-    
+    const commandPane = new OptionsPane(this.#uimanager)
+    const options = commandPane.renderPane()
+    controlContainer.appendChild(options)
 
     return controlContainer
   }

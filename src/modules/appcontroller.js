@@ -3,6 +3,7 @@
 
 import Player from "./player.js"
 import BoardController from "./UI/boardcontroller.js"
+import ControlPane from "./UI/controlPane.js"
 import UIManager from "./UI/uimanager.js"
 
 /**
@@ -22,11 +23,12 @@ class AppController {
 
   /**
    * Set the initial pane to setup the pieces on the board and start the game
-   *
+   * @param {Object[]} pieces 
    * */
-  setControlPane(){
-
-
+  setControlPane(pieces){
+    const controlPane = new ControlPane(this.#uimanager)
+    const element = controlPane.renderControlPane(pieces)
+    this.#appContainer.appendChild(element)
   }
 
   /**

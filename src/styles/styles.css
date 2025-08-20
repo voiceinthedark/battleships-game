@@ -18,10 +18,8 @@
 @font-face {
   font-family: 'Montserrat';
   src:
-    url('../assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf')
-      format('truetype'),
-    url('../assets/fonts/Montserrat/Montserrat-Italic-VariableFont_wght.ttf')
-      format('truetype');
+    url('../assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf') format('truetype'),
+    url('../assets/fonts/Montserrat/Montserrat-Italic-VariableFont_wght.ttf') format('truetype');
   font-weight: 100 900;
   font-style: normal, italic;
 }
@@ -51,34 +49,34 @@ body {
   flex-direction: column;
 }
 
-.header{
+.header {
   font-family: 'Montserrat', sans-serif;
   font-size: 150%;
 }
 
-.container{
+.container {
   display: grid;
   grid-template-columns: 6fr 6fr;
 
-  .board-container{
+  .board-container {
     display: flex;
     flex-direction: column;
     gap: 20px;
     justify-content: center;
     align-items: center;
 
-    .board-name{
+    .board-name {
       font-size: 130%;
       font-weight: bold;
     }
 
-    .board-player{
+    .board-player {
       display: grid;
       grid-template-columns: repeat(14, 1fr);
       /* justify-items: center; */
       align-content: end;
 
-      .board-cell{
+      .board-cell {
         height: 50px;
         width: 50px;
         border: 1px solid black;
@@ -86,16 +84,55 @@ body {
     }
   }
 
-  .control-container{
+  .control-container {
     display: grid;
     grid-template-columns: 4fr 2fr;
 
     /** LEFT SIDE OF THE CONTROL */
-    .control-pieces{
-      display: grid;
-      grid-template-columns: 2fr 2fr;
+    .control-pieces-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      .control-pieces-name{
+        font-size: 150%;
+        font-weight: bold;
+      }
+
+      .control-pieces {
+        display: grid;
+        grid-template-columns: 2fr 2fr;
+        gap: 20px;
+      }
+    }
+
+    /** right side of the control */
+    .command-pane{
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      justify-content: flex-start;
+      align-items: center;
+
+      .command-name{
+        font-size: 150%;
+        font-weight: bold;
+      }
+
+      & > button{
+        appearance: none;
+        width: 190px;
+        padding: 4px 10px;
+        border-radius: 12px;
+        border: 5px solid black;
+        background-color: #12aa43;
+        color: #fff;
+        font-size: 130%;
+      }
 
     }
+
+
   }
 
 }
