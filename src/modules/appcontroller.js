@@ -152,6 +152,19 @@ class AppController {
       controlContainer.replaceChild(p, computerBoard)
     }
 
+    // restore the buttons
+    const startButton = document.querySelector('.command-start')
+    const randomButton = document.querySelector('.command-random')
+    const rotateButton = document.querySelector('.command-rotate')
+
+    if (startButton instanceof HTMLButtonElement
+      && randomButton instanceof HTMLButtonElement
+      && rotateButton instanceof HTMLButtonElement) {
+      startButton.disabled = false
+      randomButton.disabled = false
+      rotateButton.disabled = false
+    }
+
     this.#appContainer.replaceChild(newBoard, boardContainer)
   }
 
@@ -182,6 +195,18 @@ class AppController {
     const computerBoard = bController.renderBoard(computer, this.handleCellClick)
     controlContainer.replaceChild(computerBoard, controlPieces)
     // Buttons beside the reset need to be disabled
+    const startButton = document.querySelector('.command-start')
+    const randomButton = document.querySelector('.command-random')
+    const rotateButton = document.querySelector('.command-rotate')
+
+    if (startButton instanceof HTMLButtonElement
+      && randomButton instanceof HTMLButtonElement
+      && rotateButton instanceof HTMLButtonElement) {
+      startButton.disabled = true
+      randomButton.disabled = true
+      rotateButton.disabled = true
+
+    }
   }
 }
 

@@ -141,6 +141,12 @@ body {
           background-color: #12bb43;
           cursor: pointer;
         }
+
+        &:disabled{
+          color: #113213;
+          border: 1px dashed black;
+          cursor: auto;
+        }
       }
 
     }
