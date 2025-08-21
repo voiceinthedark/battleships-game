@@ -142,13 +142,15 @@ class AppController {
     const boardContainer = document.querySelector('.board-container')
     const bController = new BoardController(this.#uimanager)
     const newBoard = bController.renderBoard(player, this.handleCellClick.bind(this))
-    // TODO remove the computer board and add the piecespane
     const controlContainer = document.querySelector('.control-container')
     const pPane = new PiecesPane(this.#uimanager)
     const p = pPane.renderPane(pieces, 'horizontal')
     // get the computer board
     const computerBoard = controlContainer.querySelector('.board-container')
-    controlContainer.replaceChild(p, computerBoard)
+    // NOTE Fix for pressing the reset button when the computerBoard isn't loaded
+    if (computerBoard) {
+      controlContainer.replaceChild(p, computerBoard)
+    }
 
     this.#appContainer.replaceChild(newBoard, boardContainer)
   }
