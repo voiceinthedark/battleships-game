@@ -1,6 +1,6 @@
 {
   "name": "battleship-game",
-  "version": "0.1.59",
+  "version": "0.1.65",
   "description": "Battleship game in vanilla javascript",
   "main": "index.js",
   "homepage": "https://github.com/voiceinthedark/battleships-game",

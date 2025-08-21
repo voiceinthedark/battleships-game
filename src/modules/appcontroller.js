@@ -35,7 +35,8 @@ class AppController {
     const controlPane = new ControlPane(this.#uimanager)
     const element = controlPane.renderControlPane(pieces,
       (/**@type {Event} */e) => this.handleRotationCommand(e, pieces),
-      (/**@type {Event} */e) => this.handleRandomCommand(e, gameboard, pieces, player, computer))
+      (/**@type {Event} */e) => this.handleRandomCommand(e, gameboard, pieces, player, computer),
+      (/**@type {Event} */e) => this.handleResetCommand(e, gameboard, player, computer))
     this.#appContainer.appendChild(element)
   }
 
@@ -58,7 +59,9 @@ class AppController {
     // TODO: The user is only allowed to click his own board at setup
     // WARN: disable clicking the cells after initial game setup
     e.preventDefault()
-    console.log(`${e.target.dataset.id}`)
+    if (e.target instanceof HTMLElement) {
+      console.log(`${e.target.dataset.id}`)
+    }
   }
 
   /**
@@ -101,8 +104,6 @@ class AppController {
     player.board = gameboard.playerBoard
     computer.board = gameboard.computerBoard
 
-    // player.ships = []
-    // computer.ships = []
     Utils.randomizeOrientation(pieces)
     Utils.populateBoardRandomly(gameboard, pieces, player)
     Utils.randomizeOrientation(pieces)
@@ -117,6 +118,30 @@ class AppController {
     const newBoard = bController.renderBoard(player, this.handleCellClick.bind(this))
 
     control.before(newBoard)
+  }
+
+  /**
+   * Handle the reset command
+   * @param {Event} e 
+   * @param {GameBoard} gameboard 
+   * @param {Player} player 
+   * @param {Player} computer 
+   * */
+  handleResetCommand(e, gameboard, player, computer) {
+    e.preventDefault()
+    gameboard.resetPlayerBoard()
+    gameboard.resetComputerBoard()
+
+    player.board = gameboard.playerBoard
+    computer.board = gameboard.computerBoard
+    player.ships = gameboard.playerShips
+    computer.ships = gameboard.computerShips
+    // NOTE refresh the board
+    const boardContainer = document.querySelector('.board-container')
+    const bController = new BoardController(this.#uimanager)
+    const newBoard = bController.renderBoard(player, this.handleCellClick.bind(this))
+
+    this.#appContainer.replaceChild(newBoard, boardContainer)
   }
 }
 
