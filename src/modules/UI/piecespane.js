@@ -57,9 +57,7 @@ class PiecesPane {
       }
       piece.style.backgroundColor = 'green'
       piece.style.border = '2px solid black'
-
     }
-
     return piecesBoard
   }
 

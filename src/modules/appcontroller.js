@@ -36,7 +36,7 @@ class AppController {
     const element = controlPane.renderControlPane(pieces,
       (/**@type {Event} */e) => this.handleRotationCommand(e, pieces),
       (/**@type {Event} */e) => this.handleRandomCommand(e, gameboard, pieces, player, computer),
-      (/**@type {Event} */e) => this.handleResetCommand(e, gameboard, player, computer),
+      (/**@type {Event} */e) => this.handleResetCommand(e, gameboard, pieces, player, computer),
       (/**@type {Event} */e) => this.handleStartCommand(e, gameboard, player, computer))
     this.#appContainer.appendChild(element)
   }
@@ -125,10 +125,11 @@ class AppController {
    * Handle the reset command
    * @param {Event} e 
    * @param {GameBoard} gameboard 
+   * @param {Object[]} pieces 
    * @param {Player} player 
    * @param {Player} computer 
    * */
-  handleResetCommand(e, gameboard, player, computer) {
+  handleResetCommand(e, gameboard, pieces, player, computer) {
     e.preventDefault()
     gameboard.resetPlayerBoard()
     gameboard.resetComputerBoard()
@@ -142,6 +143,12 @@ class AppController {
     const bController = new BoardController(this.#uimanager)
     const newBoard = bController.renderBoard(player, this.handleCellClick.bind(this))
     // TODO remove the computer board and add the piecespane
+    const controlContainer = document.querySelector('.control-container')
+    const pPane = new PiecesPane(this.#uimanager)
+    const p = pPane.renderPane(pieces, 'horizontal')
+    // get the computer board
+    const computerBoard = controlContainer.querySelector('.board-container')
+    controlContainer.replaceChild(p, computerBoard)
 
     this.#appContainer.replaceChild(newBoard, boardContainer)
   }
