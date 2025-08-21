@@ -23,6 +23,9 @@ class Game {
     this.#computer = computer
   }
 
+  /**
+   * @method run to start a game simulation
+   * */
   run() {
     // event loop
     let gameOn = true;
@@ -84,6 +87,14 @@ class Game {
         Utils.printBoard(this.#computer.board)
       }
     }
+  }
+
+  runForUI() {
+    let gameOn = false
+    this.#player.turn = true;
+    this.#computer.turn = false;
+    let coords;
+    let hit;
   }
 }
 

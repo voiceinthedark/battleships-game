@@ -43,25 +43,67 @@ class AppController {
 
   /**
    * Set the board on the page
+   * @param {GameBoard} gameboard 
    * @param {Player} player 
+   * @param {Player} computer 
    * */
-  setBoard(player) {
+  setBoard(gameboard, player, computer) {
     const board = new BoardController(this.#uimanager)
-    const boardUI = board.renderBoard(player, this.handleCellClick.bind(this))
+    const boardUI = board.renderBoard(player, (e) => this.handleCellClick(e, gameboard, player, computer))
     this.#appContainer.appendChild(boardUI)
   }
 
   /**
    * Handle the cell click on the board
    * @param {Event} e 
+   * @param {GameBoard} gameboard 
+   * @param {Player} player 
+   * @param {Player} computer 
    * */
-  handleCellClick(e) {
+  handleCellClick(e, gameboard, player, computer) {
     // NOTE: need to control where the user clicks
     // TODO: The user is only allowed to click his own board at setup
     // WARN: disable clicking the cells after initial game setup
     e.preventDefault()
+    let coordinates  
+    let hit
     if (e.target instanceof HTMLElement) {
       console.log(`${e.target.dataset.id}`)
+      coordinates = e.target.dataset.id.split(',')
+    }
+    // TODO start a game loop to switch between turns and check whether a player wins
+    // Player Turn
+    // NOTE if board cell is already click do nothing
+    if(computer.board[coordinates[0]][coordinates[1]] === -1 
+      || computer.board[coordinates[0]][coordinates[1]] === 9){
+      console.log(`already attacked cell ${coordinates}`)
+      return
+    }
+    // NOTE attack the cell otherwise
+    if(computer.board[coordinates[0]][coordinates[1]] === 0 
+      || computer.board[coordinates[0]][coordinates[1]] === 1){
+      console.log(`attacking cell ${coordinates}`)
+      coordinates = coordinates.map(n => parseInt(n))
+      hit = gameboard.receiveAttack(coordinates, computer.board)
+      // NOTE do something when hit is true
+      this.updateBoard(e, hit)
+    }
+
+    // TODO Computer Turn
+  }
+
+  /**
+   * @method updateBoard to update the board after cell click
+   * @param {Event} e 
+   * @param {boolean} hit 
+   * */
+  updateBoard(e, hit) {
+    if (e.target instanceof HTMLDivElement) {
+      if (hit) {
+        e.target.style.backgroundColor = 'red'
+      } else {
+        e.target.style.backgroundColor = 'gray'
+      }
     }
   }
 
@@ -116,6 +158,7 @@ class AppController {
     // const oldBoard = document.querySelector('.board-container')
     const control = document.querySelector('.control-container')
     const bController = new BoardController(this.#uimanager)
+    // WARN handleCellClick check
     const newBoard = bController.renderBoard(player, this.handleCellClick.bind(this))
 
     control.before(newBoard)
@@ -141,6 +184,7 @@ class AppController {
     // NOTE refresh the board
     const boardContainer = document.querySelector('.board-container')
     const bController = new BoardController(this.#uimanager)
+    // WARN check the handleCellClick for errors later on
     const newBoard = bController.renderBoard(player, this.handleCellClick.bind(this))
     const controlContainer = document.querySelector('.control-container')
     const pPane = new PiecesPane(this.#uimanager)
@@ -192,7 +236,8 @@ class AppController {
     const controlContainer = document.querySelector('.control-container')
     const controlPieces = document.querySelector('.control-pieces-section')
     const bController = new BoardController(this.#uimanager)
-    const computerBoard = bController.renderBoard(computer, this.handleCellClick)
+    const computerBoard = bController.renderBoard(computer, 
+      (e) => this.handleCellClick(e, gameboard, player, computer))
     controlContainer.replaceChild(computerBoard, controlPieces)
     // Buttons beside the reset need to be disabled
     const startButton = document.querySelector('.command-start')

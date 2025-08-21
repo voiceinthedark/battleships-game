@@ -5,17 +5,17 @@ import "./styles/styles.css"
 // import "./styles/solid.min.css";
 // import "./styles/brands.min.css";
 
-import Utils from './modules/utils.js'
+// import Utils from './modules/utils.js'
 import Player from './modules/player.js'
 import GameBoard from './modules/gameboard.js'
-import Game from './modules/game.js'
+// import Game from './modules/game.js'
 
 
 
 let g = new GameBoard()
 let p = new Player('player', g.playerBoard)
 let c = new Player('computer', g.computerBoard)
-let game = new Game(g, p, c);
+// let game = new Game(g, p, c);
 
 let obj = [
   { length: 6, orientation: 'horizontal' },
@@ -45,8 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function runApp() {
     const appcontroller = new AppController(appContainer)
-    appcontroller.setBoard(p)
-    // TODO: show setup pane during game setup, then replace it with computer board
+    appcontroller.setBoard(g, p, c)
     appcontroller.setControlPane(g, obj, p, c)
     // appcontroller.setBoard(c)
   }
