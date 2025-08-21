@@ -36,7 +36,8 @@ class AppController {
     const element = controlPane.renderControlPane(pieces,
       (/**@type {Event} */e) => this.handleRotationCommand(e, pieces),
       (/**@type {Event} */e) => this.handleRandomCommand(e, gameboard, pieces, player, computer),
-      (/**@type {Event} */e) => this.handleResetCommand(e, gameboard, player, computer))
+      (/**@type {Event} */e) => this.handleResetCommand(e, gameboard, player, computer),
+      (/**@type {Event} */e) => this.handleStartCommand(e, gameboard, player, computer))
     this.#appContainer.appendChild(element)
   }
 
@@ -140,8 +141,38 @@ class AppController {
     const boardContainer = document.querySelector('.board-container')
     const bController = new BoardController(this.#uimanager)
     const newBoard = bController.renderBoard(player, this.handleCellClick.bind(this))
+    // TODO remove the computer board and add the piecespane
 
     this.#appContainer.replaceChild(newBoard, boardContainer)
+  }
+
+  /**
+   * handle the start of the game
+   * @param {Event} e 
+   * @param {GameBoard} gameboard 
+   * @param {Player} player 
+   * @param {Player} computer 
+   * */
+  handleStartCommand(e, gameboard, player, computer) {
+    e.preventDefault()
+    // TODO handle the start command
+    // NOTE make sure there are pieces on the board and player/computer ships are assigned before starting
+    if (gameboard.playerShips.length === 0
+      || gameboard.computerShips.length === 0
+      || gameboard.computerBoard === null) {
+      // TODO make it a modal later on
+      console.log('error starting game')
+      alert('You need to setup the board first before starting the game')
+      return
+    }
+    // Need to remove the pieces pane and replace it with computer board
+    // Get the control container and replace it with a board-container
+    const controlContainer = document.querySelector('.control-container')
+    const controlPieces = document.querySelector('.control-pieces-section')
+    const bController = new BoardController(this.#uimanager)
+    const computerBoard = bController.renderBoard(computer, this.handleCellClick)
+    controlContainer.replaceChild(computerBoard, controlPieces)
+    // Buttons beside the reset need to be disabled
   }
 }
 

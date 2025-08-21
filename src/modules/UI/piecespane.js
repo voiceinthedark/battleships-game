@@ -31,6 +31,9 @@ class PiecesPane {
     const pieceName = this.#uimanager.addElement('span', piecesBoard, 'control-pieces-name')
     pieceName.textContent = 'Your fleet'
     const controlPieces = this.#uimanager.addElement('div', piecesBoard, 'control-pieces')
+
+    const cellSize = getComputedStyle(document.documentElement).getPropertyValue('--cell-size').trim()
+
     for (let p of pieces) {
       // NOTE Every piece is a unit that contains length pieces
       // NOTE in case of horizontal orientation the width of the piece is 50px * length, height is 50px
@@ -40,14 +43,14 @@ class PiecesPane {
       const piece = this.#uimanager.addElement('div', controlPieces, 'contol-piece')
       // case horizontal
       if (orientation === 'horizontal') {
-        piece.style.height = '50px'
-        piece.style.width = `${50 * p.length}px`
+        piece.style.height = cellSize
+        piece.style.width = `${parseFloat(cellSize) * p.length}px`
         controlPieces.classList.remove('control-pieces-vertical')
         controlPieces.classList.add('control-pieces')
       }
       if (orientation === 'vertical') {
-        piece.style.height = `${50 * p.length}px`
-        piece.style.width = '50px'
+        piece.style.height = `${parseFloat(cellSize) * p.length}px`
+        piece.style.width = cellSize
         // change the grid to 4 fractions
         controlPieces.classList.remove('control-pieces')
         controlPieces.classList.add('control-pieces-vertical')

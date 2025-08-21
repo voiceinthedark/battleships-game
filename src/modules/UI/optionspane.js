@@ -23,8 +23,10 @@ class OptionsPane {
    * @param {(event: Event) => void} handleRotationCommand
    * @param {(even: Event) => void} handleRandomCommand 
    * @param {(event: Event) => void} handleResetCommand
+   * @param {(event: Event) => void} handleStartCommand 
    * */
-  renderPane(handleRotationCommand, handleRandomCommand, handleResetCommand) {
+  renderPane(handleRotationCommand, handleRandomCommand, 
+    handleResetCommand, handleStartCommand) {
     const commandPane = document.createElement('div')
     commandPane.classList.add('command-pane')
 
@@ -45,6 +47,7 @@ class OptionsPane {
 
     const startCommand = this.#uimanager.addElement('button', commandPane, 'command-start')
     startCommand.textContent = 'Start'
+    startCommand.addEventListener('click', handleStartCommand)
 
     return commandPane
   }

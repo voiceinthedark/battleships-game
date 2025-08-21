@@ -24,9 +24,11 @@ class ControlPane {
    * @param {(event: Event) => void} handleRotationCommand 
    * @param {(event: Event) => void} handleRandomCommand 
    * @param {(event: Event) => void} handleResetCommand
+   * @param {(event: Event) => void} handleStartCommand 
    * @returns {HTMLElement} the control pane element
    * */
-  renderControlPane(pieces, handleRotationCommand, handleRandomCommand, handleResetCommand) {
+  renderControlPane(pieces, handleRotationCommand, 
+    handleRandomCommand, handleResetCommand, handleStartCommand) {
     const controlContainer = document.createElement('div')
     controlContainer.classList.add('control-container')
 
@@ -37,7 +39,7 @@ class ControlPane {
 
     const commandPane = new OptionsPane(this.#uimanager)
     const options = commandPane.renderPane(handleRotationCommand,
-      handleRandomCommand, handleResetCommand)
+      handleRandomCommand, handleResetCommand, handleStartCommand)
     controlContainer.appendChild(options)
 
     return controlContainer
