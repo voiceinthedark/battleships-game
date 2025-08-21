@@ -32,27 +32,28 @@ class BoardController {
     nameSpan.textContent = `${player.name}`
 
     let boardPlayer = this.#uimanager.addElement('div', boardContainer, 'board-player');
-    if(player.name === 'computer'){
+    if (player.name === 'computer') {
       boardPlayer.classList.remove('board-player')
       boardPlayer.classList.add('board-computer')
     }
-    for(let i = 0; i < player.board.length; i++){
-      for(let j = 0; j < player.board[i].length; j++){
+    for (let i = 0; i < player.board.length; i++) {
+      for (let j = 0; j < player.board[i].length; j++) {
         let boardCell = this.#uimanager.addElement('div', boardPlayer, 'board-cell')
         boardCell.dataset.id = `${i},${j}`
-        if(player.board[i][j] === 1 && player.name === 'player'){
+        if (player.board[i][j] === 1 && player.name === 'player') {
           boardCell.style.backgroundColor = 'green'
-        } 
-        if(player.board[i][j] === 9){
+        }
+        if (player.board[i][j] === 9) {
           boardCell.style.backgroundColor = 'red'
         }
 
-        // Add event listener on the cell 
-        boardCell.addEventListener('click', handleclick)
+        // only on computer board add handle click on the cells
+        // WARN take note on when to handle drag an drop of pieces
+        if (player.name === 'computer') {
+          boardCell.addEventListener('click', handleclick)
+        }
       }
     }
-
-
     return boardContainer
   }
 }
