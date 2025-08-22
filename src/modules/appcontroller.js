@@ -20,6 +20,7 @@ class AppController {
   #uimanager
   /**@type {Game} */
   #game
+  #gameStartTime = null
   /**
    * @param {HTMLElement} appContainer
    * */
@@ -27,6 +28,7 @@ class AppController {
     this.#appContainer = appContainer
     this.#uimanager = new UIManager(this.#appContainer)
     this.#game = null;
+    this.#gameStartTime = null
   }
 
   /**
@@ -89,13 +91,11 @@ class AppController {
       }
       // Check if player won
       if (playerTurnResult.winner === 'player') {
-        // TODO: Stop the game and declare winner player
-        // TODO: Show a summary of time and turns taken to beat the game
         const modal = new ModalController(this.#uimanager)
         const result = {
           time: {
             name: 'Time',
-            value: '1minute' // TODO: calculate time
+            value: this.#calculateAndFormatGameTime()
           },
           ships: {
             name: 'Ships left',
@@ -103,7 +103,7 @@ class AppController {
           },
           misses: {
             name: 'Missed Shots',
-            value: computer.board.reduce((a, c) => a + c.filter(e => e === -1).length, 0) 
+            value: computer.board.reduce((a, c) => a + c.filter(e => e === -1).length, 0)
           }
         }
         const modalUI = document.querySelector('.modal')
@@ -129,6 +129,30 @@ class AppController {
         if (computerTurnResult.winner === 'computer') {
           console.log(`${computer.name} wins the game!`);
           // TODO: Stop the game, declare winner, show summary
+          const modal = new ModalController(this.#uimanager)
+          const result = {
+            time: {
+              name: 'Time',
+              value: this.#calculateAndFormatGameTime()
+            },
+            ships: {
+              name: 'Ships left',
+              value: computer.ships.filter(s => !s.isSunk()).length, // Computer wins, so show player's remaining ships
+            },
+            misses: {
+              name: 'Missed Shots',
+              value: player.board.reduce((a, c) => a + c.filter(e => e === -1).length, 0) // Computer wins, so show player's missed shots on their board
+            }
+          }
+          const modalUI = document.querySelector('.modal')
+          const m = modal.render('Computer', result, (/**@type {Event} */e) => {
+            if (modalUI instanceof HTMLDivElement)
+              modalUI.style.display = 'none'
+          })
+          modalUI.appendChild(m)
+          if (modalUI instanceof HTMLDivElement) {
+            modalUI.style.display = 'block'
+          }
           return; // Game is over
         }
       }
@@ -313,6 +337,40 @@ class AppController {
 
     // setup game Object
     this.#game = new Game(gameboard, player, computer);
+    this.#gameStartTime = Date.now()
+  }
+
+  /**
+     * Calculates the elapsed game time and formats it.
+     * @returns {string} The formatted time (e.g., "2 minutes 30 seconds").
+     */
+  #calculateAndFormatGameTime() {
+    if (this.#gameStartTime === null) {
+      return 'N/A'; // Game was not started or timer already reset
+    }
+
+    const endTime = Date.now();
+    const elapsedTimeMs = endTime - this.#gameStartTime;
+    this.#gameStartTime = null; // Reset the timer after calculation
+
+    const totalSeconds = Math.floor(elapsedTimeMs / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    let timeString = '';
+    if (minutes > 0) {
+      timeString += `${minutes} minute${minutes === 1 ? '' : 's'}`;
+    }
+    if (seconds > 0) {
+      if (timeString !== '') {
+        timeString += ' ';
+      }
+      timeString += `${seconds} second${seconds === 1 ? '' : 's'}`;
+    }
+    if (timeString === '') {
+      timeString = 'Less than a second';
+    }
+    return timeString;
   }
 
   openModal() {
