@@ -10,7 +10,6 @@
    * @property {string} [error] - error message if turn is invalid
    * */
 
-import AppController from "./appcontroller.js";
 import GameBoard from "./gameboard.js";
 import Player from "./player.js";
 import Utils from "./utils.js";
@@ -20,20 +19,17 @@ class Game {
   #gameboard
   #player
   #computer
-  #appcontroller
 
   /**
    * @constructor
    * @param {GameBoard} gameboard 
    * @param {Player} player 
    * @param {Player} computer 
-   * @param {AppController} [appcontroller=null] 
    * */
-  constructor(gameboard, player, computer, appcontroller = null) {
+  constructor(gameboard, player, computer) {
     this.#gameboard = gameboard
     this.#player = player
     this.#computer = computer
-    this.#appcontroller = appcontroller;
   }
 
   /**

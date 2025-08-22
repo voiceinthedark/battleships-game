@@ -60,12 +60,18 @@ class GameBoard {
     return this.#computerShips
   }
 
+  /**
+   * Method resetPlayerBoard to reset the player board and ships
+   * */
   resetPlayerBoard(){
     this.#playerBoard = []
     Utils.fillTheBoard(this.#playerBoard, this.#height, this.#width)
     this.#playerShips = []
   }
 
+  /**
+   * Method resetComputerBoard to reset the computer board and ships
+   * */
   resetComputerBoard(){
     this.#computerBoard = []
     Utils.fillTheBoard(this.#computerBoard, this.#height, this.#width)
@@ -74,10 +80,10 @@ class GameBoard {
 
   /**
    * @method to place the ship on the board
-   * @param {Ship} ship
+   * @param {Ship} ship - this ship object to be placed on the board
    * @param {Array<number>} start - start between 0 and width or height - length
    * @param {Array<Array>} board - The board where the ship should be placed (computer or player)
-   * @returns {boolean}
+   * @returns {boolean} whether a ship has been placed or not
    * */
   placeShip(ship, start, board) {
     if (!this.#checkBoundaries(ship, start, board)) return false
@@ -152,9 +158,9 @@ class GameBoard {
 
   /**
    * @method to receive the attack on the board
-   * @param {Array<number>} coords
-   * @param {Array<Array>} board
-   * @returns {boolean}
+   * @param {Array<number>} coords - the coordinates on the board to be attacked
+   * @param {Array<Array>} board - the board that needs to receive the attack player/computer
+   * @returns {boolean} true on hit false otherwise
    * */
   receiveAttack(coords, board) {
     // TODO: receive an attack on the board and calculate

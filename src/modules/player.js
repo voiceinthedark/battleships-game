@@ -19,18 +19,24 @@ class Player {
 
   /**
    * @constructor
-   * @param {string} name
-   * @param {Array<Array>} board
+   * @param {string} name - player name
+   * @param {Array<Array>} board - player board, usually extracted from GameBoard
    * */
   constructor(name, board) {
     this.#name = name
     this.#board = board
   }
 
+  /**
+   * method to return the name of the player
+   * */
   get name() {
     return this.#name
   }
 
+  /**
+   * method to return the baord of the player
+   * */
   get board() {
     return this.#board
   }

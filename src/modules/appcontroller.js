@@ -59,13 +59,12 @@ class AppController {
 
   /**
    * Handle the cell click on the board
-   * @param {Event} e 
-   * @param {GameBoard} gameboard 
-   * @param {Player} player 
-   * @param {Player} computer 
+   * @param {Event} e - event object of the click 
+   * @param {GameBoard} gameboard - the gameboard
+   * @param {Player} player - the player
+   * @param {Player} computer - the computer
    * */
   handleCellClick(e, gameboard, player, computer) {
-    // TODO: The user is only allowed to click his own board at setup
     // WARN: disable clicking the cells after initial game setup
     e.preventDefault()
     let coordinates
@@ -77,7 +76,6 @@ class AppController {
       console.log(`${e.target.dataset.id}`)
       coordinates = e.target.dataset.id.split(',')
     }
-    // TODO start a game loop to switch between turns and check whether a player wins
     if (this.#game) {
       // Player Turn
       playerTurnResult = this.#game.playTurn(player, coordinates)
@@ -150,8 +148,8 @@ class AppController {
 
   /**
    * @method handleRotationCommand to handle the rotation of the pieces on the board
-   * @param {Event} e 
-   * @param {Object[]} pieces 
+   * @param {Event} e - the event object
+   * @param {Object[]} pieces the pieces array that needs to be rotated
     * */
   handleRotationCommand(e, pieces) {
     e.preventDefault()
@@ -171,11 +169,11 @@ class AppController {
 
   /**
    * @method handleRandomCommand to handle the random placement command
-   * @param {Event} e 
-   * @param {GameBoard} gameboard 
-   * @param {Object[]} pieces 
-   * @param {Player} player 
-   * @param {Player} computer 
+   * @param {Event} e - The event object
+   * @param {GameBoard} gameboard - the gameboard object
+   * @param {Object[]} pieces - the pieces object
+   * @param {Player} player - the player
+   * @param {Player} computer - the computer
    * */
   handleRandomCommand(e, gameboard, pieces, player, computer) {
     e.preventDefault()
@@ -199,7 +197,6 @@ class AppController {
     // const oldBoard = document.querySelector('.board-container')
     const control = document.querySelector('.control-container')
     const bController = new BoardController(this.#uimanager)
-    // WARN handleCellClick check
     const newBoard = bController.renderBoard(player, this.handleCellClick.bind(this))
 
     control.before(newBoard)
@@ -225,7 +222,6 @@ class AppController {
     // NOTE refresh the board
     const boardContainer = document.querySelector('.board-container')
     const bController = new BoardController(this.#uimanager)
-    // WARN check the handleCellClick for errors later on
     const newBoard = bController.renderBoard(player, this.handleCellClick.bind(this))
     const controlContainer = document.querySelector('.control-container')
     const pPane = new PiecesPane(this.#uimanager)
@@ -262,7 +258,6 @@ class AppController {
    * */
   handleStartCommand(e, gameboard, player, computer) {
     e.preventDefault()
-    // TODO handle the start command
     // NOTE make sure there are pieces on the board and player/computer ships are assigned before starting
     if (gameboard.playerShips.length === 0
       || gameboard.computerShips.length === 0
@@ -294,7 +289,7 @@ class AppController {
     }
 
     // setup game Object
-    this.#game = new Game(gameboard, player, computer, this);
+    this.#game = new Game(gameboard, player, computer);
   }
 }
 
