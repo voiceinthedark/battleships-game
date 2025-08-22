@@ -1,6 +1,7 @@
 // appcontroller.js
 // @ts-check
 
+import Game from "./game.js"
 import GameBoard from "./gameboard.js"
 import Player from "./player.js"
 import BoardController from "./UI/boardcontroller.js"
@@ -16,12 +17,15 @@ import Utils from "./utils.js"
 class AppController {
   #appContainer
   #uimanager
+  /**@type {Game} */
+  #game
   /**
    * @param {HTMLElement} appContainer
    * */
   constructor(appContainer) {
     this.#appContainer = appContainer
     this.#uimanager = new UIManager(this.#appContainer)
+    this.#game = null;
   }
 
   /**
@@ -61,50 +65,87 @@ class AppController {
    * @param {Player} computer 
    * */
   handleCellClick(e, gameboard, player, computer) {
-    // NOTE: need to control where the user clicks
     // TODO: The user is only allowed to click his own board at setup
     // WARN: disable clicking the cells after initial game setup
     e.preventDefault()
-    let coordinates  
-    let hit
+    let coordinates
+    /** @type {import('./game.js').Result} */
+    let playerTurnResult;
+    /** @type {import('./game.js').Result} */
+    let computerTurnResult;
     if (e.target instanceof HTMLElement) {
       console.log(`${e.target.dataset.id}`)
       coordinates = e.target.dataset.id.split(',')
     }
     // TODO start a game loop to switch between turns and check whether a player wins
-    // Player Turn
-    // NOTE if board cell is already click do nothing
-    if(computer.board[coordinates[0]][coordinates[1]] === -1 
-      || computer.board[coordinates[0]][coordinates[1]] === 9){
-      console.log(`already attacked cell ${coordinates}`)
-      return
-    }
-    // NOTE attack the cell otherwise
-    if(computer.board[coordinates[0]][coordinates[1]] === 0 
-      || computer.board[coordinates[0]][coordinates[1]] === 1){
-      console.log(`attacking cell ${coordinates}`)
-      coordinates = coordinates.map(n => parseInt(n))
-      hit = gameboard.receiveAttack(coordinates, computer.board)
-      // NOTE do something when hit is true
-      this.updateBoard(e, hit)
-    }
+    if (this.#game) {
+      // Player Turn
+      playerTurnResult = this.#game.playTurn(player, coordinates)
+      if (playerTurnResult.error) {
+        console.log(`Player turn error ${playerTurnResult.error}`)
+        return
+      }
+      if (e.target instanceof HTMLDivElement) {
+        this.updateBoard(e.target, playerTurnResult.hit)
+      }
+      // Check if player won
+      if (playerTurnResult.winner === 'player') {
+        // TODO: Stop the game and declare winner player
+        // TODO: Show a summary of time and turns taken to beat the game
+        console.log(`${player.name} wins the game!`)
+        return;
+      }
+      if (playerTurnResult.gameOn) {
+        // Computer turn
+        computerTurnResult = this.#game.playTurn(computer)
+        // Update the UI for the computer's attack on the player's board
+        this.updatePlayerBoardUI(computerTurnResult.coordinates, computerTurnResult.hit);
 
-    // TODO Computer Turn
+        // Check if computer won immediately after their turn
+        if (computerTurnResult.winner === 'computer') {
+          console.log(`${computer.name} wins the game!`);
+          // TODO: Stop the game, declare winner, show summary
+          return; // Game is over
+        }
+      }
+    }
   }
+
 
   /**
    * @method updateBoard to update the board after cell click
-   * @param {Event} e 
+   * @param {HTMLDivElement} cellElement - a dom element representing a cell 
    * @param {boolean} hit 
    * */
-  updateBoard(e, hit) {
-    if (e.target instanceof HTMLDivElement) {
+  updateBoard(cellElement, hit) {
+    if (cellElement instanceof HTMLDivElement) {
       if (hit) {
-        e.target.style.backgroundColor = 'red'
+        cellElement.style.backgroundColor = 'red'
       } else {
-        e.target.style.backgroundColor = 'gray'
+        cellElement.style.backgroundColor = 'gray'
       }
     }
+  }
+
+
+  /**
+   * method to update the playerboard after computer attack
+   * @param {Array<number>} coordinates - [row, col] of the attacked cell 
+   * @param {boolean} hit - Whether the attack was a hit or a miss 
+   * */
+  updatePlayerBoardUI(coordinates, hit) {
+    const playerBoardElement = document.querySelector('.board-container .board-player')
+    if (playerBoardElement) {
+      const cellElement = playerBoardElement.querySelector(`[data-id="${coordinates[0]},${coordinates[1]}"]`)
+      if (cellElement instanceof HTMLDivElement) {
+        this.updateBoard(cellElement, hit)
+      }
+    } else {
+      console.error('Player board element not found for UI update');
+
+    }
+
+
   }
 
   /**
@@ -236,7 +277,7 @@ class AppController {
     const controlContainer = document.querySelector('.control-container')
     const controlPieces = document.querySelector('.control-pieces-section')
     const bController = new BoardController(this.#uimanager)
-    const computerBoard = bController.renderBoard(computer, 
+    const computerBoard = bController.renderBoard(computer,
       (e) => this.handleCellClick(e, gameboard, player, computer))
     controlContainer.replaceChild(computerBoard, controlPieces)
     // Buttons beside the reset need to be disabled
@@ -250,8 +291,10 @@ class AppController {
       startButton.disabled = true
       randomButton.disabled = true
       rotateButton.disabled = true
-
     }
+
+    // setup game Object
+    this.#game = new Game(gameboard, player, computer, this);
   }
 }
 
