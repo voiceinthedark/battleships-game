@@ -36,7 +36,6 @@ class ModalController {
    * @returns {HTMLElement} the modal-container element
    * */
   render(winner, results, handleClickCallback) {
-    // TODO render the modal on the screen
     const modalContainer = document.createElement('div')
     modalContainer.classList.add('modal-container')
 
@@ -55,9 +54,10 @@ class ModalController {
     }
 
     const keySpan = this.#uimanager.addElement('span', modalContainer, 'modal-key')
-    keySpan.textContent = 'Press any key to close...'
+    keySpan.textContent = 'Click anywhere to close...'
 
-    //TODO handleClickCallback
+    // FIX the keypress event
+    modalContainer.addEventListener('keypress', handleClickCallback)
     modalContainer.addEventListener('click', handleClickCallback)
 
     return modalContainer

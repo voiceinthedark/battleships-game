@@ -91,6 +91,31 @@ class AppController {
       if (playerTurnResult.winner === 'player') {
         // TODO: Stop the game and declare winner player
         // TODO: Show a summary of time and turns taken to beat the game
+        const modal = new ModalController(this.#uimanager)
+        const result = {
+          time: {
+            name: 'Time',
+            value: '1minute' // TODO: calculate time
+          },
+          ships: {
+            name: 'Ships left',
+            value: player.ships.filter(s => !s.isSunk()).length,
+          },
+          misses: {
+            name: 'Missed Shots',
+            value: computer.board.reduce((a, c) => a + c.filter(e => e === -1).length, 0) 
+          }
+        }
+        const modalUI = document.querySelector('.modal')
+        const m = modal.render('Player', result, (/**@type {Event} */e) => {
+          if (modalUI instanceof HTMLDivElement)
+            modalUI.style.display = 'none'
+        })
+        modalUI.appendChild(m)
+        if (modalUI instanceof HTMLDivElement) {
+          modalUI.style.display = 'block'
+        }
+
         console.log(`${player.name} wins the game!`)
         return;
       }
@@ -141,10 +166,7 @@ class AppController {
       }
     } else {
       console.error('Player board element not found for UI update');
-
     }
-
-
   }
 
   /**
@@ -293,7 +315,7 @@ class AppController {
     this.#game = new Game(gameboard, player, computer);
   }
 
-  openModal(){
+  openModal() {
     const results = {
       time: {
         name: 'Time',
@@ -308,9 +330,16 @@ class AppController {
         value: 54,
       },
     }
+    const container = document.querySelector('.modal')
     const modal = new ModalController(this.#uimanager)
-    const m = modal.render('Jim', results, ()=> {})
-    document.querySelector('.modal').appendChild(m)
+    const m = modal.render('Jim', results, (e) => {
+      if (container instanceof HTMLDivElement) {
+        container.style.display = 'none'
+      }
+    })
+    if (container instanceof HTMLDivElement)
+      container.style.display = 'block'
+    container.appendChild(m)
   }
 }
 

@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     appcontroller.setBoard(g, p, c)
     appcontroller.setControlPane(g, obj, p, c)
     // appcontroller.setBoard(c)
-    appcontroller.openModal()
+    // appcontroller.openModal()
   }
 
   runApp();
