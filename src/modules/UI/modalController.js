@@ -15,7 +15,6 @@
  * */
 
 import Player from "../player.js"
-import GameBoard from "../gameboard.js"
 import UIManager from "./uimanager.js"
 
 class ModalController {
@@ -31,7 +30,7 @@ class ModalController {
 
   /**
    * method render to render the modal on the screen
-   * @param {Player} winner 
+   * @param {string} winner 
    * @param {Results} results 
    * @param {(event: Event) => void} handleClickCallback 
    * @returns {HTMLElement} the modal-container element
@@ -39,10 +38,10 @@ class ModalController {
   render(winner, results, handleClickCallback) {
     // TODO render the modal on the screen
     const modalContainer = document.createElement('div')
-    modalContainer.classList.add('.modal-container')
+    modalContainer.classList.add('modal-container')
 
     const nameSpan = this.#uimanager.addElement('span', modalContainer, 'modal-name')
-    nameSpan.textContent = `${winner.name} wins the game!`
+    nameSpan.textContent = `${winner} wins the game!`
 
     const summaryTable = this.#uimanager.addElement('table', modalContainer, 'modal-summary')
     for (const [key, categoryData] of Object.entries(results)) {

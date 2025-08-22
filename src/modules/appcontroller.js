@@ -6,6 +6,7 @@ import GameBoard from "./gameboard.js"
 import Player from "./player.js"
 import BoardController from "./UI/boardcontroller.js"
 import ControlPane from "./UI/controlPane.js"
+import ModalController from "./UI/modalController.js"
 import PiecesPane from "./UI/piecespane.js"
 import UIManager from "./UI/uimanager.js"
 import Utils from "./utils.js"
@@ -290,6 +291,26 @@ class AppController {
 
     // setup game Object
     this.#game = new Game(gameboard, player, computer);
+  }
+
+  openModal(){
+    const results = {
+      time: {
+        name: 'Time',
+        value: '1 minute 34 seconds',
+      },
+      ships: {
+        name: 'Ships left',
+        value: 3,
+      },
+      misses: {
+        name: 'Missed Shots',
+        value: 54,
+      },
+    }
+    const modal = new ModalController(this.#uimanager)
+    const m = modal.render('Jim', results, ()=> {})
+    document.querySelector('.modal').appendChild(m)
   }
 }
 
