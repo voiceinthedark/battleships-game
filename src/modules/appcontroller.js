@@ -298,9 +298,6 @@ class AppController {
     }
     control.before(newBoard) // Assuming the player board is placed before the control container
     this.#refreshPiecesPaneUI(); // Refresh pieces pane, all pieces should be 'placed' if successfully populated
-
-
-
   }
 
   /**
@@ -324,6 +321,9 @@ class AppController {
     this.#refreshPlayerBoardUI(this.#player);
     // Refresh the pieces pane
     this.#refreshPiecesPaneUI();
+
+    // ERROR when reseting
+
 
     // restore the buttons
     const startButton = document.querySelector('.command-start')
@@ -349,7 +349,7 @@ class AppController {
     // NOTE make sure there are pieces on the board and player/computer ships are assigned before starting
     if (this.#player.ships.length === 0
       || this.#computer.ships.length === 0
-      ) {
+    ) {
       this.#displayModalError('You need to setup the board first before starting the game');
       return
     }
@@ -649,7 +649,13 @@ class AppController {
     } else {
       // If oldPiecesPane wasn't found (e.g., initial setup or after random placement clear),
       // ensure we add it if there are still unplaced pieces.
-      controlContainer.appendChild(newPiecesPane);
+      // FIX to replace the computer board with pieces elements on reset
+      const computerElement = document.querySelector('.control-container .board-container')
+      if (computerElement) {
+        controlContainer.replaceChild(newPiecesPane, computerElement)
+      } else {
+        controlContainer.appendChild(newPiecesPane);
+      }
       oldPiecesPane = newPiecesPane; // Update reference if newly added
     }
 
