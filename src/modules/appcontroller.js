@@ -108,12 +108,14 @@ class AppController {
         }
         const modalUI = document.querySelector('.modal')
         const m = modal.render('Player', result, (/**@type {Event} */e) => {
-          if (modalUI instanceof HTMLDivElement)
+          if (modalUI instanceof HTMLDivElement) {
             modalUI.style.display = 'none'
+            modalUI.removeChild(m)
+          }
         })
         modalUI.appendChild(m)
         if (modalUI instanceof HTMLDivElement) {
-          modalUI.style.display = 'block'
+          modalUI.style.display = 'flex'
         }
 
         console.log(`${player.name} wins the game!`)
@@ -146,12 +148,14 @@ class AppController {
           }
           const modalUI = document.querySelector('.modal')
           const m = modal.render('Computer', result, (/**@type {Event} */e) => {
-            if (modalUI instanceof HTMLDivElement)
+            if (modalUI instanceof HTMLDivElement) {
               modalUI.style.display = 'none'
+              modalUI.removeChild(m)
+            }
           })
           modalUI.appendChild(m)
           if (modalUI instanceof HTMLDivElement) {
-            modalUI.style.display = 'block'
+            modalUI.style.display = 'flex'
           }
           return; // Game is over
         }
@@ -311,7 +315,25 @@ class AppController {
       || gameboard.computerBoard === null) {
       // TODO make it a modal later on
       console.log('error starting game')
-      alert('You need to setup the board first before starting the game')
+      // alert('You need to setup the board first before starting the game')
+      // create a modal
+      const modal = new ModalController(this.#uimanager)
+      const modalUI = document.querySelector('.modal')
+      const m = modal.renderMessage(
+        {
+          type: 'Error',
+          message: 'You need to setup the board first before starting the game'
+        },
+        (e) => {
+          if (modalUI instanceof HTMLDivElement) {
+            modalUI.style.display = 'none'
+            modalUI.removeChild(m)
+          }
+        })
+      modalUI.appendChild(m)
+      if (modalUI instanceof HTMLDivElement) {
+        modalUI.style.display = 'flex'
+      }
       return
     }
     // Need to remove the pieces pane and replace it with computer board

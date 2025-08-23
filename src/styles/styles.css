@@ -65,15 +65,14 @@ body {
   background-color: rgba(11, 11, 11, 0.9);
   z-index: 10;
 
-  & > .modal-container {
+   .modal-container {
     position: relative;
     display: flex;
     flex-direction: column;
-    height: inherit;
-    width: inherit;
     justify-content: center;
     align-items: center;
-    gap: 20px;
+    width: inherit;
+    height: inherit;
     font-size: 200%;
     color: #fff;
 
@@ -87,6 +86,14 @@ body {
       margin: 0 auto;
       min-width: 500px;
       border-collapse: collapse;
+    }
+
+    .modal-message{
+      font-size: 130%;
+    }
+
+    .modal-type{
+      font-size: 140%;
     }
 
   }
@@ -185,13 +192,6 @@ body {
           cursor: auto;
         }
       }
-
     }
-
-
   }
-
-
-
-
 }

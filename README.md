@@ -11,6 +11,7 @@ console output:
 ## Roadmap
 
 - [ ] Add interactive log 
-- [ ] Add summary to game end
+- [x] Add summary to game end
 - [ ] Add drag and drop feature for pieces placement
 - [ ] Refine the board graphically
+- [ ] Add two player mode on same machine

@@ -62,6 +62,30 @@ class ModalController {
 
     return modalContainer
   }
+
+  /**
+   * Method to render a message to the user
+   * @param {Object} obj 
+   * @param {string} obj.type
+   * @param {string} obj.message
+   * @param {(event: Event) => void} handleClickCallback 
+   * */
+  renderMessage(obj, handleClickCallback){
+    const modalContainer = document.createElement('div')
+    modalContainer.classList.add('modal-container')
+    const typeSpan = this.#uimanager.addElement('span', modalContainer, 'modal-type')
+    typeSpan.textContent = `${obj.type}`
+
+    const msgSpan = this.#uimanager.addElement('span', modalContainer, 'modal-message')
+    msgSpan.textContent = `${obj.message}`
+
+    const closeSpan = this.#uimanager.addElement('span', modalContainer, 'modal-key')
+    closeSpan.textContent = 'Click anywhere to close...'
+
+    modalContainer.addEventListener('click', handleClickCallback)
+
+    return modalContainer
+  }
 }
 
 export default ModalController
