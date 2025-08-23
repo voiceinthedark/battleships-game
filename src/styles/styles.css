@@ -99,11 +99,6 @@ body {
   }
 }
 
-.dragging {
-  border: 2px dotted red;
-  opacity: 1;
-}
-
 .container {
   display: grid;
   grid-template-columns: 5fr 7fr;
@@ -155,10 +150,15 @@ body {
         grid-template-columns: 2fr 2fr;
         gap: 20px;
 
+        .control-piece {
+          background-color: green;
+        }
+
         .control-piece.dragging {
-          background-color: #52fb34;
-          border: 5px dotted blue;
-          opacity: 0.4;
+          /* appearance: none; */
+          background-color: #12ab14;
+          border: 5px dashed black;
+          opacity: 1;
           cursor: move;
         }
       }
@@ -167,6 +167,18 @@ body {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 20px;
+
+        .control-piece {
+          background-color: green;
+        }
+
+        .control-piece.dragging {
+          /* appearance: none; */
+          background-color: #12ab14;
+          border: 5px dashed black;
+          opacity: 1;
+          cursor: move;
+        }
       }
     }
 

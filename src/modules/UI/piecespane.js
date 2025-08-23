@@ -81,8 +81,8 @@ class PiecesPane {
         controlPieces.classList.remove('control-pieces')
         controlPieces.classList.add('control-pieces-vertical')
       }
-      piece.style.backgroundColor = 'green'
-      piece.style.border = '2px solid black'
+      // piece.style.backgroundColor = 'green'
+      // piece.style.border = '2px solid black'
     }
     return piecesBoard
   }
