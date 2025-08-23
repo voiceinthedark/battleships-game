@@ -21,6 +21,8 @@ class PiecesPane {
    * @method renderPane to render the pieces pane on the page
    * @param {Object[]} pieces - Array of objects that designate the pieces
    * @param {number} pieces[].length - length of the piece
+   * @param {string} pieces[].id - unique id for the piece
+   * @param {boolean} pieces[].placed - true if piece placed on the board
    * @param {string} pieces[].orientation - orientation of the piece
    * @param {string} orientation - orientation of the pieces, vertical or horizontal 
    * @returns {HTMLElement} the pieces board
@@ -34,13 +36,37 @@ class PiecesPane {
 
     const cellSize = getComputedStyle(document.documentElement).getPropertyValue('--cell-size').trim()
 
-    for (let p of pieces) {
-      // NOTE Every piece is a unit that contains length pieces
-      // NOTE in case of horizontal orientation the width of the piece is 50px * length, height is 50px
-      // NOTE in vertical orientation width is 50px while height is 50px * length
-      // TODO place the pieces on the board
-      // TODO allow drag and drop of the pieces onto the player board
-      const piece = this.#uimanager.addElement('div', controlPieces, 'contol-piece')
+    // Filter out already placed pieces for rendering
+    const unplacedPieces = pieces.filter(p => !p.placed);
+
+    if (unplacedPieces.length === 0) {
+      // If no unplaced pieces, maybe show a message or return an empty container
+      // The AppController will handle removing/replacing this pane entirely if all are placed.
+      // For now, return an empty container.
+      return piecesBoard;
+    }
+
+    for (let p of unplacedPieces) {
+      const piece = this.#uimanager.addElement('div', controlPieces, 'control-piece')
+      piece.draggable = true; // Make the piece draggable
+      piece.dataset.length = p.length.toString(); // Store piece length
+      piece.dataset.orientation = orientation; // Store current orientation
+      piece.dataset.pieceId = p.id; // Store unique ID for identification
+
+      piece.addEventListener('dragstart', (e) => {
+        // Transfer piece data as JSON string
+        e.dataTransfer.setData('text/plain', JSON.stringify({
+          length: p.length,
+          orientation: orientation,
+          pieceId: p.id
+        }));
+        piece.classList.add('dragging'); // Optional: Add class for visual feedback
+      });
+
+      piece.addEventListener('dragend', (e) => {
+        piece.classList.remove('dragging'); // Optional: Remove class
+      });
+
       // case horizontal
       if (orientation === 'horizontal') {
         piece.style.height = cellSize

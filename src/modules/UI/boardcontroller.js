@@ -23,34 +23,69 @@ class BoardController {
   /**
    * @method renderBoard to display the board on screen
    * @param {Player} player - the board to display, player or computer 
-   * @param {(event: Event) => void} handleclick - callback method to apply on each square of the board
+   * @param {(event: Event) => void} [handleComputerCellClick] - callback method to apply on each square of the board
+   * @param {{(event: DragEvent, coords: number[], pieceData: object) => void}} [handlePlayerCellDrop] - callback for dropping pieces on player's board
+   * @param {{(event: DragEvent, coords: number[]) => void}} [handlePlayerCellDragOver] - callback for drag over on player's board
+   * @param {{(event: DragEvent, coords: number[]) => void}} [handlePlayerCellDragEnter] - callback for drag enter on player's board
+   * @param {{(event: DragEvent, coords: number[]) => void}} [handlePlayerCellDragLeave] - callback for drag leave on player's board
+   * @returns {HTMLElement} The board container element.
    * */
-  renderBoard(player, handleclick) {
+  renderBoard(player, handleComputerCellClick, handlePlayerCellDrop, handlePlayerCellDragOver, handlePlayerCellDragEnter, handlePlayerCellDragLeave) {
     let boardContainer = document.createElement('div')
     boardContainer.classList.add('board-container')
+    if (player.name === 'player') {
+      boardContainer.classList.add('board-player-container');
+    }
+
     let nameSpan = this.#uimanager.addElement('span', boardContainer, 'board-name')
     nameSpan.textContent = `${player.name}`
 
-    let boardPlayer = this.#uimanager.addElement('div', boardContainer, 'board-player');
+    let boardElement = this.#uimanager.addElement('div', boardContainer, 'board-player'); // Renamed from boardPlayer for clarity
     if (player.name === 'computer') {
-      boardPlayer.classList.remove('board-player')
-      boardPlayer.classList.add('board-computer')
+      boardElement.classList.remove('board-player')
+      boardElement.classList.add('board-computer')
     }
+
     for (let i = 0; i < player.board.length; i++) {
       for (let j = 0; j < player.board[i].length; j++) {
-        let boardCell = this.#uimanager.addElement('div', boardPlayer, 'board-cell')
+        let boardCell = this.#uimanager.addElement('div', boardElement, 'board-cell')
         boardCell.dataset.id = `${i},${j}`
+
+        // Apply visual styles for placed ships on player's board
         if (player.board[i][j] === 1 && player.name === 'player') {
           boardCell.style.backgroundColor = 'green'
         }
-        if (player.board[i][j] === 9) {
+        // Apply visual styles for hit/missed cells (for both boards if applicable)
+        if (player.board[i][j] === 9) { // Assuming 9 for hit
           boardCell.style.backgroundColor = 'red'
+        } else if (player.board[i][j] === -1) { // Assuming -1 for miss
+          boardCell.style.backgroundColor = 'gray'
         }
 
-        // only on computer board add handle click on the cells
-        // WARN take note on when to handle drag an drop of pieces
+
         if (player.name === 'computer') {
-          boardCell.addEventListener('click', handleclick)
+          // Only on computer board add handle click on the cells for attacking
+          boardCell.addEventListener('click', handleComputerCellClick)
+        } else if (player.name === 'player') {
+          // Add drag-and-drop listeners to player's board cells
+          boardCell.addEventListener('dragover', (e) => {
+            e.preventDefault(); // This is crucial to allow a drop
+            if (handlePlayerCellDragOver) handlePlayerCellDragOver(e, [i, j]);
+          });
+          boardCell.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if (handlePlayerCellDrop) {
+              const pieceData = JSON.parse(e.dataTransfer.getData('text/plain'));
+              handlePlayerCellDrop(e, [i, j], pieceData);
+            }
+          });
+          boardCell.addEventListener('dragenter', (e) => {
+            e.preventDefault(); // Also important for dragenter to work consistently
+            if (handlePlayerCellDragEnter) handlePlayerCellDragEnter(e, [i, j]);
+          });
+          boardCell.addEventListener('dragleave', (e) => {
+            if (handlePlayerCellDragLeave) handlePlayerCellDragLeave(e, [i, j]);
+          });
         }
       }
     }

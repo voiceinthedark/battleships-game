@@ -4,6 +4,7 @@
 import Game from "./game.js"
 import GameBoard from "./gameboard.js"
 import Player from "./player.js"
+import Ship from "./ship.js"
 import BoardController from "./UI/boardcontroller.js"
 import ControlPane from "./UI/controlPane.js"
 import ModalController from "./UI/modalController.js"
@@ -21,6 +22,16 @@ class AppController {
   /**@type {Game} */
   #game
   #gameStartTime = null
+  /**@type {Array<Object & {id: string, placed: boolean}>} */
+  #pieces
+  /**@type {GameBoard} */
+  #gameboard
+  /**@type {Player} */
+  #player
+  /**@type {Player} */
+  #computer
+
+
   /**
    * @param {HTMLElement} appContainer
    * */
@@ -29,6 +40,10 @@ class AppController {
     this.#uimanager = new UIManager(this.#appContainer)
     this.#game = null;
     this.#gameStartTime = null
+    this.#pieces = []
+    this.#gameboard = null
+    this.#player = null
+    this.#computer = null
   }
 
   /**
@@ -39,12 +54,21 @@ class AppController {
    * @param {Player} computer 
    * */
   setControlPane(gameboard, pieces, player, computer) {
+    this.#gameboard = gameboard;
+    this.#player = player;
+    this.#computer = computer;
+
+    // Augment pieces with unique IDs and a 'placed' status *once*
+    this.#pieces = pieces.map((p, index) => ({ ...p, id: `piece-${index}-${p.length}`, placed: false, orientation: p.orientation || 'horizontal' }));
+
+
+
     const controlPane = new ControlPane(this.#uimanager)
     const element = controlPane.renderControlPane(pieces,
-      (/**@type {Event} */e) => this.handleRotationCommand(e, pieces),
-      (/**@type {Event} */e) => this.handleRandomCommand(e, gameboard, pieces, player, computer),
-      (/**@type {Event} */e) => this.handleResetCommand(e, gameboard, pieces, player, computer),
-      (/**@type {Event} */e) => this.handleStartCommand(e, gameboard, player, computer))
+      (/**@type {Event} */e) => this.handleRotationCommand(e),
+      (/**@type {Event} */e) => this.handleRandomCommand(e),
+      (/**@type {Event} */e) => this.handleResetCommand(e),
+      (/**@type {Event} */e) => this.handleStartCommand(e))
     this.#appContainer.appendChild(element)
   }
 
@@ -55,8 +79,17 @@ class AppController {
    * @param {Player} computer 
    * */
   setBoard(gameboard, player, computer) {
+    this.#gameboard = gameboard;
+    this.#player = player;
+    this.#computer = computer;
+
     const board = new BoardController(this.#uimanager)
-    const boardUI = board.renderBoard(player, (e) => this.handleCellClick(e, gameboard, player, computer))
+    const boardUI = board.renderBoard(player,
+      (e) => this.handleCellClick(e, gameboard, player, computer),
+      (e, coords, pieceData) => this.handlePlayerCellDrop(e, coords, pieceData),
+      (e, coords) => this.handlePlayerCellDragOver(e, coords),
+      (e, coords) => this.handlePlayerCellDragEnter(e, coords),
+      (e, coords) => this.handlePlayerCellDragLeave(e, coords))
     this.#appContainer.appendChild(boardUI)
   }
 
@@ -130,7 +163,6 @@ class AppController {
         // Check if computer won immediately after their turn
         if (computerTurnResult.winner === 'computer') {
           console.log(`${computer.name} wins the game!`);
-          // TODO: Stop the game, declare winner, show summary
           const modal = new ModalController(this.#uimanager)
           const result = {
             time: {
@@ -200,89 +232,98 @@ class AppController {
   /**
    * @method handleRotationCommand to handle the rotation of the pieces on the board
    * @param {Event} e - the event object
-   * @param {Object[]} pieces the pieces array that needs to be rotated
     * */
-  handleRotationCommand(e, pieces) {
+  handleRotationCommand(e) {
     e.preventDefault()
     let orientation;
-    if (pieces[0].orientation === 'horizontal') {
+    // Get current orientation from an unplaced piece, or default to horizontal
+    const firstUnplacedPiece = this.#pieces.find(p => !p.placed);
+    if (!firstUnplacedPiece) {
+      console.log('No pieces left to rotate.');
+      this.#displayModalError('All ships have been placed. No pieces to rotate.');
+      return;
+    }
+
+    if (firstUnplacedPiece.orientation === 'horizontal') {
       orientation = 'vertical'
-    } else if (pieces[0].orientation === 'vertical') {
+    } else if (firstUnplacedPiece.orientation === 'vertical') {
       orientation = 'horizontal'
     }
-    pieces.map(p => p.orientation = orientation)
-    const piecesPane = new PiecesPane(this.#uimanager)
-    const controlContainer = document.querySelector('.control-container')
-    const oldPane = document.querySelector('.control-pieces-section')
-    const ppane = piecesPane.renderPane(pieces, orientation)
-    controlContainer.replaceChild(ppane, oldPane)
+    // Update orientation for all unplaced pieces
+    this.#pieces.filter(p => !p.placed).map(p => p.orientation = orientation);
+
+    this.#refreshPiecesPaneUI(); // Re-render the pieces pane with new orientation
+
   }
 
   /**
    * @method handleRandomCommand to handle the random placement command
    * @param {Event} e - The event object
-   * @param {GameBoard} gameboard - the gameboard object
-   * @param {Object[]} pieces - the pieces object
-   * @param {Player} player - the player
-   * @param {Player} computer - the computer
    * */
-  handleRandomCommand(e, gameboard, pieces, player, computer) {
+  handleRandomCommand(e) {
     e.preventDefault()
     // clear all the boards
     const oldBoards = document.querySelectorAll('.board-container')
     oldBoards.forEach(board => board.remove())
-    gameboard.resetPlayerBoard()
-    gameboard.resetComputerBoard()
+    this.#gameboard.resetPlayerBoard()
+    this.#gameboard.resetComputerBoard()
 
-    player.board = gameboard.playerBoard
-    computer.board = gameboard.computerBoard
+    this.#player.board = this.#gameboard.playerBoard
+    this.#computer.board = this.#gameboard.computerBoard
 
-    Utils.randomizeOrientation(pieces)
-    Utils.populateBoardRandomly(gameboard, pieces, player)
-    Utils.randomizeOrientation(pieces)
-    Utils.populateBoardRandomly(gameboard, pieces, computer)
-    player.ships = gameboard.playerShips
-    computer.ships = gameboard.computerShips
+    // Reset placed status for all pieces before randomizing
+    this.#pieces.forEach(p => p.placed = false);
+
+    Utils.randomizeOrientation(this.#pieces)
+    Utils.populateBoardRandomly(this.#gameboard, this.#pieces, this.#player)
+    Utils.randomizeOrientation(this.#pieces)
+    Utils.populateBoardRandomly(this.#gameboard, this.#pieces, this.#computer)
+    this.#player.ships = this.#gameboard.playerShips
+    this.#computer.ships = this.#gameboard.computerShips
 
 
-    // const oldBoard = document.querySelector('.board-container')
     const control = document.querySelector('.control-container')
     const bController = new BoardController(this.#uimanager)
-    const newBoard = bController.renderBoard(player, this.handleCellClick.bind(this))
+    const newBoard = bController.renderBoard(this.#player,
+      null, // No click handler for player's own board
+      (e, coords, pieceData) => this.handlePlayerCellDrop(e, coords, pieceData),
+      (e, coords) => this.handlePlayerCellDragOver(e, coords),
+      (e, coords) => this.handlePlayerCellDragEnter(e, coords),
+      (e, coords) => this.handlePlayerCellDragLeave(e, coords)
+    )
+    // Remove the old player board if it exists before adding the new one
+    const oldPlayerBoardContainer = document.querySelector('.board-container.board-player-container');
+    if (oldPlayerBoardContainer) {
+      oldPlayerBoardContainer.remove();
+    }
+    control.before(newBoard) // Assuming the player board is placed before the control container
+    this.#refreshPiecesPaneUI(); // Refresh pieces pane, all pieces should be 'placed' if successfully populated
 
-    control.before(newBoard)
+
+
   }
 
   /**
    * Handle the reset command
    * @param {Event} e 
-   * @param {GameBoard} gameboard 
-   * @param {Object[]} pieces 
-   * @param {Player} player 
-   * @param {Player} computer 
    * */
-  handleResetCommand(e, gameboard, pieces, player, computer) {
+  handleResetCommand(e) {
     e.preventDefault()
-    gameboard.resetPlayerBoard()
-    gameboard.resetComputerBoard()
+    this.#gameboard.resetPlayerBoard()
+    this.#gameboard.resetComputerBoard()
 
-    player.board = gameboard.playerBoard
-    computer.board = gameboard.computerBoard
-    player.ships = gameboard.playerShips
-    computer.ships = gameboard.computerShips
-    // NOTE refresh the board
-    const boardContainer = document.querySelector('.board-container')
-    const bController = new BoardController(this.#uimanager)
-    const newBoard = bController.renderBoard(player, this.handleCellClick.bind(this))
-    const controlContainer = document.querySelector('.control-container')
-    const pPane = new PiecesPane(this.#uimanager)
-    const p = pPane.renderPane(pieces, 'horizontal')
-    // get the computer board
-    const computerBoard = controlContainer.querySelector('.board-container')
-    // NOTE Fix for pressing the reset button when the computerBoard isn't loaded
-    if (computerBoard) {
-      controlContainer.replaceChild(p, computerBoard)
-    }
+    this.#player.board = this.#gameboard.playerBoard
+    this.#computer.board = this.#gameboard.computerBoard
+    this.#player.ships = this.#gameboard.playerShips // Should be empty after resetPlayerBoard
+    this.#computer.ships = this.#gameboard.computerShips // Should be empty after resetComputerBoard
+
+    // Reset all pieces to 'unplaced' for the pieces pane
+    this.#pieces.forEach(p => p.placed = false);
+
+    // Refresh the player board
+    this.#refreshPlayerBoardUI(this.#player);
+    // Refresh the pieces pane
+    this.#refreshPiecesPaneUI();
 
     // restore the buttons
     const startButton = document.querySelector('.command-start')
@@ -296,44 +337,20 @@ class AppController {
       randomButton.disabled = false
       rotateButton.disabled = false
     }
-
-    this.#appContainer.replaceChild(newBoard, boardContainer)
   }
+
 
   /**
    * handle the start of the game
    * @param {Event} e 
-   * @param {GameBoard} gameboard 
-   * @param {Player} player 
-   * @param {Player} computer 
    * */
-  handleStartCommand(e, gameboard, player, computer) {
+  handleStartCommand(e) {
     e.preventDefault()
     // NOTE make sure there are pieces on the board and player/computer ships are assigned before starting
-    if (gameboard.playerShips.length === 0
-      || gameboard.computerShips.length === 0
-      || gameboard.computerBoard === null) {
-      // TODO make it a modal later on
-      console.log('error starting game')
-      // alert('You need to setup the board first before starting the game')
-      // create a modal
-      const modal = new ModalController(this.#uimanager)
-      const modalUI = document.querySelector('.modal')
-      const m = modal.renderMessage(
-        {
-          type: 'Error',
-          message: 'You need to setup the board first before starting the game'
-        },
-        (e) => {
-          if (modalUI instanceof HTMLDivElement) {
-            modalUI.style.display = 'none'
-            modalUI.removeChild(m)
-          }
-        })
-      modalUI.appendChild(m)
-      if (modalUI instanceof HTMLDivElement) {
-        modalUI.style.display = 'flex'
-      }
+    if (this.#player.ships.length === 0
+      || this.#computer.ships.length === 0
+      ) {
+      this.#displayModalError('You need to setup the board first before starting the game');
       return
     }
     // Need to remove the pieces pane and replace it with computer board
@@ -341,9 +358,16 @@ class AppController {
     const controlContainer = document.querySelector('.control-container')
     const controlPieces = document.querySelector('.control-pieces-section')
     const bController = new BoardController(this.#uimanager)
-    const computerBoard = bController.renderBoard(computer,
-      (e) => this.handleCellClick(e, gameboard, player, computer))
-    controlContainer.replaceChild(computerBoard, controlPieces)
+    const computerBoard = bController.renderBoard(this.#computer,
+      (e) => this.handleCellClick(e, this.#gameboard, this.#player, this.#computer),
+      null, null, null, null // No drag/drop handlers for computer board
+    )
+    if (controlPieces) {
+      controlContainer.replaceChild(computerBoard, controlPieces)
+    } else {
+      controlContainer.appendChild(computerBoard); // If for some reason pieces pane isn't there
+    }
+
     // Buttons beside the reset need to be disabled
     const startButton = document.querySelector('.command-start')
     const randomButton = document.querySelector('.command-random')
@@ -358,8 +382,9 @@ class AppController {
     }
 
     // setup game Object
-    this.#game = new Game(gameboard, player, computer);
+    this.#game = new Game(this.#gameboard, this.#player, this.#computer);
     this.#gameStartTime = Date.now()
+
   }
 
   /**
@@ -420,6 +445,249 @@ class AppController {
     if (container instanceof HTMLDivElement)
       container.style.display = 'block'
     container.appendChild(m)
+  }
+
+  // --- Drag and Drop Helper Methods ---
+
+  /**
+   * Helper to get all cells a piece would occupy if placed at startCoords.
+   * @param {number[]} startCoords - [row, col] of the starting cell.
+   * @param {number} pieceLength - Length of the piece.
+   * @param {string} orientation - 'horizontal' or 'vertical'.
+   * @param {Array<Array<number>>} playerBoard - The current player's board grid.
+   * @returns {Array<Array<number>> | null} An array of [row, col] pairs, or null if out of bounds.
+   */
+  #getCellsForPlacement(startCoords, pieceLength, orientation, playerBoard) {
+    const [startRow, startCol] = startCoords;
+    const cells = [];
+    const boardSize = playerBoard.length;
+
+    for (let i = 0; i < pieceLength; i++) {
+      let row, col;
+      if (orientation === 'horizontal') {
+        row = startRow;
+        col = startCol + i;
+      } else { // vertical
+        row = startRow + i;
+        col = startCol;
+      }
+
+      // Check boundaries
+      if (row < 0 || row >= boardSize || col < 0 || col >= boardSize) {
+        return null; // Out of bounds
+      }
+      cells.push([row, col]);
+    }
+    return cells;
+  }
+
+  /**
+   * Checks if a piece placement is valid (within bounds and no overlaps).
+   * @param {number[]} startCoords - [row, col] of the starting cell.
+   * @param {number} pieceLength - Length of the piece.
+   * @param {string} orientation - 'horizontal' or 'vertical'.
+   * @param {Array<Array<number>>} playerBoard - The current player's board grid.
+   * @returns {boolean} True if placement is valid, false otherwise.
+   */
+  #isValidPlacement(startCoords, pieceLength, orientation, playerBoard) {
+    const cells = this.#getCellsForPlacement(startCoords, pieceLength, orientation, playerBoard);
+    if (!cells) return false; // Out of bounds
+
+    // Check for overlaps with existing ships (value 1)
+    for (const [r, c] of cells) {
+      if (playerBoard[r][c] === 1) {
+        return false; // Overlapping
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Handles dragover event on player board cells for visual feedback.
+   * @param {DragEvent} e - The drag event object.
+   * @param {number[]} coords - [row, col] of the cell being dragged over.
+   */
+  handlePlayerCellDragOver(e, coords) {
+    e.preventDefault(); // Crucial to allow a drop
+  }
+
+  /**
+   * Handles dragenter event on player board cells for visual feedback.
+   * @param {DragEvent} e - The drag event object.
+   * @param {number[]} coords - [row, col] of the cell being entered.
+   */
+  handlePlayerCellDragEnter(e, coords) {
+    e.preventDefault();
+    const pieceData = JSON.parse(e.dataTransfer.getData('text/plain'));
+    if (pieceData) {
+      const isValid = this.#isValidPlacement(coords, pieceData.length, pieceData.orientation, this.#player.board);
+      const cellsToHighlight = this.#getCellsForPlacement(coords, pieceData.length, pieceData.orientation, this.#player.board);
+      if (cellsToHighlight) {
+        cellsToHighlight.forEach(([r, c]) => {
+          const el = document.querySelector(`.board-player-container .board-cell[data-id="${r},${c}"]`);
+          if (el) {
+            el.classList.add(isValid ? 'drag-valid' : 'drag-invalid');
+          }
+        });
+      }
+    }
+  }
+
+  /**
+   * Handles dragleave event on player board cells to remove visual feedback.
+   * @param {DragEvent} e - The drag event object.
+   * @param {number[]} coords - [row, col] of the cell being left.
+   */
+  handlePlayerCellDragLeave(e, coords) {
+    e.preventDefault();
+    // Clear the feedback for the cells that were potentially highlighted by this drag.
+    // We cannot use e.dataTransfer.getData here reliably on dragleave,
+    // so it's better to clear more broadly or track the active drag.
+    // For now, if the drag is still active, we get the pieceData.
+    const pieceData = JSON.parse(e.dataTransfer.getData('text/plain') || '{}');
+    if (pieceData.length && pieceData.orientation) { // Check if pieceData is valid
+      this.#clearDragFeedback(coords, pieceData.length, pieceData.orientation);
+    }
+  }
+
+  /**
+   * Handles the drop event to place a piece on the player's board.
+   * @param {DragEvent} e - The drag event object.
+   * @param {number[]} coords - [row, col] of the cell where the piece was dropped.
+   * @param {Object} pieceData - Data about the dropped piece (length, orientation, id).
+   */
+  handlePlayerCellDrop(e, coords, pieceData) {
+    e.preventDefault();
+    const [row, col] = coords;
+    const { length, orientation, pieceId } = pieceData;
+
+    // Clear any drag feedback for the dropped piece's potential area
+    this.#clearDragFeedback(coords, length, orientation);
+
+    if (this.#isValidPlacement([row, col], length, orientation, this.#player.board)) {
+      // Create a Ship object using the existing Ship class structure
+      const newShip = new Ship(pieceId, length, orientation);
+      const placementResult = this.#gameboard.placeShip(newShip, coords, this.#player.board); // Pass this.#player.board
+
+      if (placementResult) { // gameboard.placeShip returns true on success, false on failure
+        // Mark the piece as placed in the internal array
+        const placedPiece = this.#pieces.find(p => p.id === pieceId);
+        if (placedPiece) {
+          placedPiece.placed = true;
+        }
+
+        this.#refreshPlayerBoardUI(this.#player); // Re-render player's board
+        this.#refreshPiecesPaneUI(); // Re-render pieces pane to remove the placed piece
+      } else {
+        // The #gameboard.placeShip already handles out of bounds or collision and returns false.
+        // #isValidPlacement should catch most of these, but this is a fallback.
+        this.#displayModalError('Failed to place ship due to an internal error or unexpected condition. Please try again.');
+      }
+    } else {
+      console.log('Placement is invalid (out of bounds or overlap).');
+      this.#displayModalError('Invalid placement: overlaps with an existing ship or out of bounds.');
+    }
+  }
+
+  /**
+     * Helper to clear drag feedback (e.g., 'drag-valid', 'drag-invalid' classes) from cells.
+     * @param {number[]} startCoords - The starting coordinates where the drag effect began.
+     * @param {number} pieceLength - The length of the piece being dragged.
+     * @param {string} orientation - The orientation of the piece.
+     */
+  #clearDragFeedback(startCoords, pieceLength, orientation) {
+    const cellsToClear = this.#getCellsForPlacement(startCoords, pieceLength, orientation, this.#player.board);
+    if (cellsToClear) {
+      cellsToClear.forEach(([r, c]) => {
+        const el = document.querySelector(`.board-player-container .board-cell[data-id="${r},${c}"]`);
+        if (el) {
+          el.classList.remove('drag-valid', 'drag-invalid');
+        }
+      });
+    }
+  }
+
+  /**
+   * Helper to refresh the player's board UI.
+   * @param {Player} player - The player whose board to refresh.
+   */
+  #refreshPlayerBoardUI(player) {
+    const oldBoardContainer = document.querySelector('.board-container.board-player-container');
+    if (!oldBoardContainer) {
+      console.error('Player board container not found for refresh.');
+      return;
+    }
+    const bController = new BoardController(this.#uimanager);
+    const newBoardUI = bController.renderBoard(player,
+      null,
+      (e, coords, pieceData) => this.handlePlayerCellDrop(e, coords, pieceData),
+      (e, coords) => this.handlePlayerCellDragOver(e, coords),
+      (e, coords) => this.handlePlayerCellDragEnter(e, coords),
+      (e, coords) => this.handlePlayerCellDragLeave(e, coords)
+    );
+    if (oldBoardContainer.parentNode) {
+      oldBoardContainer.parentNode.replaceChild(newBoardUI, oldBoardContainer);
+    }
+  }
+
+  /**
+   * Helper to refresh the pieces pane UI.
+   */
+  #refreshPiecesPaneUI() {
+    const controlContainer = document.querySelector('.control-container');
+    let oldPiecesPane = controlContainer.querySelector('.control-pieces-section');
+    const piecesPane = new PiecesPane(this.#uimanager);
+
+    const firstUnplacedPiece = this.#pieces.find(p => !p.placed);
+    const currentOrientation = firstUnplacedPiece ? firstUnplacedPiece.orientation : 'horizontal';
+
+    // FIX: Pass the *full* #pieces array. The PiecesPane class will filter out placed pieces internally.
+    const newPiecesPane = piecesPane.renderPane(this.#pieces, currentOrientation);
+
+    if (oldPiecesPane) {
+      controlContainer.replaceChild(newPiecesPane, oldPiecesPane);
+    } else {
+      // If oldPiecesPane wasn't found (e.g., initial setup or after random placement clear),
+      // ensure we add it if there are still unplaced pieces.
+      controlContainer.appendChild(newPiecesPane);
+      oldPiecesPane = newPiecesPane; // Update reference if newly added
+    }
+
+    // After rendering, if there are no unplaced pieces, remove or replace the pane
+    if (!firstUnplacedPiece && oldPiecesPane) {
+      oldPiecesPane.remove();
+      const messageElement = this.#uimanager.addElement('div', controlContainer, 'control-pieces-section');
+      messageElement.textContent = 'All ships placed!';
+      messageElement.style.textAlign = 'center';
+      messageElement.style.padding = '20px';
+      messageElement.style.border = '1px dashed #ccc';
+    }
+  }
+
+  /**
+   * Helper to display error messages in a modal.
+   * @param {string} message - The error message to display.
+   */
+  #displayModalError(message) {
+    const modal = new ModalController(this.#uimanager)
+    const modalUI = document.querySelector('.modal')
+    const m = modal.renderMessage(
+      {
+        type: 'Error',
+        message: message
+      },
+      (e) => {
+        if (modalUI instanceof HTMLDivElement) {
+          modalUI.style.display = 'none'
+          modalUI.removeChild(m)
+        }
+      })
+    if (modalUI) {
+      modalUI.appendChild(m)
+      if (modalUI instanceof HTMLDivElement) {
+        modalUI.style.display = 'flex'
+      }
+    }
   }
 }
 
