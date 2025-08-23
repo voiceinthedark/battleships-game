@@ -57,6 +57,9 @@ class AppController {
     this.#gameboard = gameboard;
     this.#player = player;
     this.#computer = computer;
+    // FIX for the error of undefined ships object
+    this.#player.ships = gameboard.playerShips
+    this.#computer.ships = gameboard.computerShips
 
     // Augment pieces with unique IDs and a 'placed' status *once*
     this.#pieces = pieces.map((p, index) => ({ ...p, id: `piece-${index}-${p.length}`, placed: false, orientation: p.orientation || 'horizontal' }));
@@ -82,6 +85,9 @@ class AppController {
     this.#gameboard = gameboard;
     this.#player = player;
     this.#computer = computer;
+    // FIX for the error of undefined ships object
+    this.#player.ships = gameboard.playerShips
+    this.#computer.ships = gameboard.computerShips
 
     const board = new BoardController(this.#uimanager)
     const boardUI = board.renderBoard(player,
@@ -345,12 +351,18 @@ class AppController {
     // TODO error in starting without input
     e.preventDefault()
     // NOTE make sure there are pieces on the board and player/computer ships are assigned before starting
-    if (this.#player.ships.length === 0
-      || this.#computer.ships.length === 0
-    ) {
+    if (this.#player.ships.length === 0) {
       this.#displayModalError('You need to setup the board first before starting the game');
       return
     }
+
+    if (this.#computer.ships.length === 0) {
+      // NOTE computer not setup on drag and drop method, set the pc up
+      Utils.randomizeOrientation(this.#pieces)
+      Utils.populateBoardRandomly(this.#gameboard, this.#pieces, this.#computer)
+      this.#computer.ships = this.#gameboard.computerShips
+    }
+
     // Need to remove the pieces pane and replace it with computer board
     // Get the control container and replace it with a board-container
     const controlContainer = document.querySelector('.control-container')
@@ -566,6 +578,9 @@ class AppController {
       // Create a Ship object using the existing Ship class structure
       const newShip = new Ship(pieceId, length, orientation);
       const placementResult = this.#gameboard.placeShip(newShip, coords, this.#player.board); // Pass this.#player.board
+
+      // FIX the problem is that the computer board and ships aren't generate
+      // FIX make the computer generate its own board
 
       if (placementResult) { // gameboard.placeShip returns true on success, false on failure
         // Mark the piece as placed in the internal array

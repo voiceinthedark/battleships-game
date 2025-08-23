@@ -34,8 +34,6 @@ class ControlPane {
     const controlContainer = document.createElement('div')
     controlContainer.classList.add('control-container')
 
-    console.log(pieces)
-
     const piecesPane = new PiecesPane(this.#uimanager)
     const ppane = piecesPane.renderPane(pieces, 'horizontal');
     controlContainer.appendChild(ppane)
