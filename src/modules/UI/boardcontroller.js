@@ -24,13 +24,18 @@ class BoardController {
    * @method renderBoard to display the board on screen
    * @param {Player} player - the board to display, player or computer 
    * @param {(event: Event) => void} [handleComputerCellClick] - callback method to apply on each square of the board
-   * @param {{(event: DragEvent, coords: number[], pieceData: object) => void}} [handlePlayerCellDrop] - callback for dropping pieces on player's board
-   * @param {{(event: DragEvent, coords: number[]) => void}} [handlePlayerCellDragOver] - callback for drag over on player's board
-   * @param {{(event: DragEvent, coords: number[]) => void}} [handlePlayerCellDragEnter] - callback for drag enter on player's board
-   * @param {{(event: DragEvent, coords: number[]) => void}} [handlePlayerCellDragLeave] - callback for drag leave on player's board
+   * @param {(event: DragEvent, coords: number[], pieceData: object) => void} [handlePlayerCellDrop] - callback for dropping pieces on player's board
+   * @param {(event: DragEvent, coords: number[]) => void} [handlePlayerCellDragOver] - callback for drag over on player's board
+   * @param {(event: DragEvent, coords: number[]) => void} [handlePlayerCellDragEnter] - callback for drag enter on player's board
+   * @param {(event: DragEvent, coords: number[]) => void} [handlePlayerCellDragLeave] - callback for drag leave on player's board
    * @returns {HTMLElement} The board container element.
    * */
-  renderBoard(player, handleComputerCellClick, handlePlayerCellDrop, handlePlayerCellDragOver, handlePlayerCellDragEnter, handlePlayerCellDragLeave) {
+  renderBoard(player, 
+    handleComputerCellClick, 
+    handlePlayerCellDrop, 
+    handlePlayerCellDragOver, 
+    handlePlayerCellDragEnter, 
+    handlePlayerCellDragLeave) {
     let boardContainer = document.createElement('div')
     boardContainer.classList.add('board-container')
     if (player.name === 'player') {

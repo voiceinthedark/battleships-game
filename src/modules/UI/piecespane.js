@@ -51,7 +51,7 @@ class PiecesPane {
       piece.draggable = true; // Make the piece draggable
       piece.dataset.length = p.length.toString(); // Store piece length
       piece.dataset.orientation = orientation; // Store current orientation
-      piece.dataset.pieceId = p.id; // Store unique ID for identification
+      piece.dataset.pieceId = String(p.id); // Store unique ID for identification
 
       piece.addEventListener('dragstart', (e) => {
         // Transfer piece data as JSON string

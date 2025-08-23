@@ -21,6 +21,8 @@ class ControlPane {
    * @param {Object[]} pieces 
    * @param {number} pieces[].length
    * @param {string} pieces[].orientation
+   * @param {string} pieces[].id
+   * @param {boolean} pieces[].placed
    * @param {(event: Event) => void} handleRotationCommand 
    * @param {(event: Event) => void} handleRandomCommand 
    * @param {(event: Event) => void} handleResetCommand
@@ -32,8 +34,9 @@ class ControlPane {
     const controlContainer = document.createElement('div')
     controlContainer.classList.add('control-container')
 
+    console.log(pieces)
+
     const piecesPane = new PiecesPane(this.#uimanager)
-    // WARN: change orientation to be dynamic later on
     const ppane = piecesPane.renderPane(pieces, 'horizontal');
     controlContainer.appendChild(ppane)
 

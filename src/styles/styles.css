@@ -65,7 +65,7 @@ body {
   background-color: rgba(11, 11, 11, 0.9);
   z-index: 10;
 
-   .modal-container {
+  .modal-container {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -76,11 +76,11 @@ body {
     font-size: 200%;
     color: #fff;
 
-    & > .modal-name{
+    &>.modal-name {
       font-size: 180%;
     }
 
-    .modal-summary{
+    .modal-summary {
       table-layout: fixed;
       /* width: 30%; */
       margin: 0 auto;
@@ -88,15 +88,20 @@ body {
       border-collapse: collapse;
     }
 
-    .modal-message{
+    .modal-message {
       font-size: 130%;
     }
 
-    .modal-type{
+    .modal-type {
       font-size: 140%;
     }
 
   }
+}
+
+.dragging {
+  border: 2px dotted red;
+  opacity: 1;
 }
 
 .container {
@@ -149,6 +154,13 @@ body {
         display: grid;
         grid-template-columns: 2fr 2fr;
         gap: 20px;
+
+        .control-piece.dragging {
+          background-color: #52fb34;
+          border: 5px dotted blue;
+          opacity: 0.4;
+          cursor: move;
+        }
       }
 
       .control-pieces-vertical {
@@ -165,6 +177,10 @@ body {
       gap: 20px;
       justify-content: flex-start;
       align-items: center;
+      padding: 5px 10px;
+      height: fit-content;
+
+      border: 1px dashed black;
 
       .command-name {
         font-size: 150%;

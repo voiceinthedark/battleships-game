@@ -61,10 +61,10 @@ class AppController {
     // Augment pieces with unique IDs and a 'placed' status *once*
     this.#pieces = pieces.map((p, index) => ({ ...p, id: `piece-${index}-${p.length}`, placed: false, orientation: p.orientation || 'horizontal' }));
 
-
+    // NOTE pieces is set correctly on setControlPane
 
     const controlPane = new ControlPane(this.#uimanager)
-    const element = controlPane.renderControlPane(pieces,
+    const element = controlPane.renderControlPane(this.#pieces, // this.#pieces fixes the problem
       (/**@type {Event} */e) => this.handleRotationCommand(e),
       (/**@type {Event} */e) => this.handleRandomCommand(e),
       (/**@type {Event} */e) => this.handleResetCommand(e),
@@ -322,9 +322,6 @@ class AppController {
     // Refresh the pieces pane
     this.#refreshPiecesPaneUI();
 
-    // ERROR when reseting
-
-
     // restore the buttons
     const startButton = document.querySelector('.command-start')
     const randomButton = document.querySelector('.command-random')
@@ -345,6 +342,7 @@ class AppController {
    * @param {Event} e 
    * */
   handleStartCommand(e) {
+    // TODO error in starting without input
     e.preventDefault()
     // NOTE make sure there are pieces on the board and player/computer ships are assigned before starting
     if (this.#player.ships.length === 0
