@@ -340,6 +340,11 @@ class AppController {
       randomButton.disabled = false
       rotateButton.disabled = false
     }
+
+    const controlPiecesMessage = document.querySelector('.control-pieces-message')
+    if (controlPiecesMessage) {
+      controlPiecesMessage.remove()
+    }
   }
 
 
@@ -389,6 +394,12 @@ class AppController {
       startButton.disabled = true
       randomButton.disabled = true
       rotateButton.disabled = true
+    }
+
+    // NOTE fix for sticking message panel
+    const controlPiecesMessage = document.querySelector('.control-pieces-message')
+    if (controlPiecesMessage) {
+      controlPiecesMessage.remove()
     }
 
     // setup game Object
@@ -675,7 +686,7 @@ class AppController {
     // After rendering, if there are no unplaced pieces, remove or replace the pane
     if (!firstUnplacedPiece && oldPiecesPane) {
       oldPiecesPane.remove();
-      const messageElement = this.#uimanager.addElement('div', controlContainer, 'control-pieces-section');
+      const messageElement = this.#uimanager.addElement('div', controlContainer, 'control-pieces-message');
       messageElement.textContent = 'All ships placed!';
       messageElement.style.textAlign = 'center';
       messageElement.style.padding = '20px';
