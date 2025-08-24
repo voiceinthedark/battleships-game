@@ -28,14 +28,16 @@ class BoardController {
    * @param {(event: DragEvent, coords: number[]) => void} [handlePlayerCellDragOver] - callback for drag over on player's board
    * @param {(event: DragEvent, coords: number[]) => void} [handlePlayerCellDragEnter] - callback for drag enter on player's board
    * @param {(event: DragEvent, coords: number[]) => void} [handlePlayerCellDragLeave] - callback for drag leave on player's board
+   * @param {string} [gamemode='single'] - gamemode single or two [default: single]
    * @returns {HTMLElement} The board container element.
    * */
-  renderBoard(player, 
-    handleComputerCellClick, 
-    handlePlayerCellDrop, 
-    handlePlayerCellDragOver, 
-    handlePlayerCellDragEnter, 
-    handlePlayerCellDragLeave) {
+  renderBoard(player,
+    handleComputerCellClick,
+    handlePlayerCellDrop,
+    handlePlayerCellDragOver,
+    handlePlayerCellDragEnter,
+    handlePlayerCellDragLeave,
+    gamemode = 'single') {
     let boardContainer = document.createElement('div')
     boardContainer.classList.add('board-container')
     if (player.name === 'player') {
@@ -57,7 +59,7 @@ class BoardController {
         boardCell.dataset.id = `${i},${j}`
 
         // Apply visual styles for placed ships on player's board
-        if (player.board[i][j] === 1 && player.name === 'player') {
+        if (player.board[i][j] === 1 && player.name === 'player' && gamemode === 'single') {
           boardCell.style.backgroundColor = 'green'
         }
         // Apply visual styles for hit/missed cells (for both boards if applicable)
@@ -67,9 +69,11 @@ class BoardController {
           boardCell.style.backgroundColor = 'gray'
         }
 
-
+        // TODO add condition for a two player mode to allow players to click on each board cells
         if (player.name === 'computer') {
           // Only on computer board add handle click on the cells for attacking
+          boardCell.addEventListener('click', handleComputerCellClick)
+        } else if (player.name === 'player' && gamemode === 'two') {
           boardCell.addEventListener('click', handleComputerCellClick)
         } else if (player.name === 'player') {
           // Add drag-and-drop listeners to player's board cells
@@ -92,7 +96,6 @@ class BoardController {
             if (handlePlayerCellDragLeave) handlePlayerCellDragLeave(e, [i, j]);
           });
         }
-        // TODO add condition for a two player mode to allow players to click on each board cells
       }
     }
     return boardContainer

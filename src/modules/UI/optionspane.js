@@ -24,9 +24,10 @@ class OptionsPane {
    * @param {(even: Event) => void} handleRandomCommand 
    * @param {(event: Event) => void} handleResetCommand
    * @param {(event: Event) => void} handleStartCommand 
+   * @param {(event: Event) => void} handleTwoPlayerCommand 
    * */
   renderPane(handleRotationCommand, handleRandomCommand, 
-    handleResetCommand, handleStartCommand) {
+    handleResetCommand, handleStartCommand, handleTwoPlayerCommand) {
     const commandPane = document.createElement('div')
     commandPane.classList.add('command-pane')
 
@@ -44,6 +45,7 @@ class OptionsPane {
     const twoplayerCommand = this.#uimanager.addElement('button', commandPane, 'command-two')
     twoplayerCommand.textContent = 'Two Player game'
     // TODO add event listeners
+    twoplayerCommand.addEventListener('click', handleTwoPlayerCommand)
 
     const resetCommand = this.#uimanager.addElement('button', commandPane, 'command-reset')
     resetCommand.textContent = "Reset Pieces"

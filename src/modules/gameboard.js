@@ -89,7 +89,6 @@ class GameBoard {
     if (!this.#checkBoundaries(ship, start, board)) return false
 
     // Check for collision
-    // WARNING: Take care that ships can't overlap
     let coords = Utils.getCoordinatesFromPoint(
       start,
       ship.length,
@@ -102,7 +101,6 @@ class GameBoard {
       ship.coordinates = Utils.initCoords(coords)
     }
 
-    // WARN: player board and computer board are distinct
     // NOTE Assess where the ship should be located on the board
     // NOTE horizontal on the x axis, i.e the inner array
     // NOTE vertical on the y axis
@@ -225,8 +223,6 @@ class GameBoard {
    * @returns {boolean}
    * */
   shipsSunk(player) {
-    // WARN: using playerShips and computerShips instead of player for now
-    // FIX change them later
     return player.every((/**@type {Ship} */ s) => s.isSunk())
   }
 }

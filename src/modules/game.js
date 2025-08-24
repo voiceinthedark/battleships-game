@@ -98,23 +98,44 @@ class Game {
     }
   }
 
-  
+
 
   /**
    * @method playTurn to let the player/computer play a turn
    * @param {Player} player - the player whose turn to play 
    * @param {Array} [coordinates=null] - the coordinates of the attack of the player exclusively
+   * @param {string} [gamemode='single'] - The gamemode of the game
    * @returns {Result} result - an object containing, hit, gameOn, and winner if any
    * */
-  playTurn(player, coordinates = null) {
+  playTurn(player, coordinates = null, gamemode = 'single') {
     let coords;
     let hit = false
     let gameOn = true
     let winner = ''
-    // Computer turn
-    if (player.name === 'computer') {
+    // TODO when player is computer and game mode is two players
+    if (player.name === 'computer' && gamemode === 'two') {
+      if (!coordinates) {
+        console.error('Player should provide coordinates');
+        return { hit: false, gameOn: true, winner: '', error: 'no coordinates provided' }
+      }
+
+      coords = coordinates.map((n) => parseInt(n))
+      if (this.#player.board[coords[0]][coords[1]] === -1
+        || this.#player.board[coords[0]][coords[1]] === 9) {
+        console.log(`already attacked cell ${coords}`)
+        return { hit: false, gameOn: true, winner: '', coordinates: coords, error: "Already attacked" }
+      }
+      // NOTE attack the cell otherwise
+      hit = this.#gameboard.receiveAttack(coords, this.#player.board);
+      if (this.#gameboard.shipsSunk(this.#player.ships)) {
+        gameOn = false;
+        winner = 'player 2';
+      }
+      return { hit, gameOn, winner, coordinates: coords };
+    } else if (player.name === 'computer') { // Computer turn
       coords = [Math.floor(Math.random() * this.#gameboard.height), Math.floor(Math.random() * this.#gameboard.width)]
-      while (this.#player.board[coords[0]][coords[1]] === -1 || this.#player.board[coords[0]][coords[1]] === 9) {
+      while (this.#player.board[coords[0]][coords[1]] === -1
+        || this.#player.board[coords[0]][coords[1]] === 9) {
         coords = [Math.floor(Math.random() * this.#gameboard.height), Math.floor(Math.random() * this.#gameboard.width)]
       }
       hit = this.#gameboard.receiveAttack(coords, this.#player.board)

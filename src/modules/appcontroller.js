@@ -74,7 +74,8 @@ class AppController {
       (/**@type {Event} */e) => this.handleRotationCommand(e),
       (/**@type {Event} */e) => this.handleRandomCommand(e),
       (/**@type {Event} */e) => this.handleResetCommand(e),
-      (/**@type {Event} */e) => this.handleStartCommand(e))
+      (/**@type {Event} */e) => this.handleStartCommand(e),
+      (/**@type {Event}*/ e) => this.handleTwoPlayerCommand(e))
     this.#appContainer.appendChild(element)
   }
 
@@ -98,7 +99,7 @@ class AppController {
       (e, coords, pieceData) => this.handlePlayerCellDrop(e, coords, pieceData),
       (e, coords) => this.handlePlayerCellDragOver(e, coords),
       (e, coords) => this.handlePlayerCellDragEnter(e, coords),
-      (e, coords) => this.handlePlayerCellDragLeave(e, coords))
+      (e, coords) => this.handlePlayerCellDragLeave(e, coords), this.#gameMode)
     this.#appContainer.appendChild(boardUI)
   }
 
@@ -117,11 +118,97 @@ class AppController {
     let playerTurnResult;
     /** @type {import('./game.js').Result} */
     let computerTurnResult;
+    /** @type {import('./game.js').Result} */
+    let playerTwoTurnResult
     if (e.target instanceof HTMLElement) {
       console.log(`${e.target.dataset.id}`)
       coordinates = e.target.dataset.id.split(',')
     }
-    if (this.#game) {
+    if (this.#game && this.#gameMode === 'two') {
+      // two player game mode
+      // TODO show modal asking for first player to play
+      // Player 1 turn
+      playerTurnResult = this.#game.playTurn(player, coordinates, this.#gameMode)
+      if (playerTurnResult.error) {
+        console.log(`Player turn error ${playerTurnResult.error}`)
+        return
+      }
+      if (e.target instanceof HTMLDivElement) {
+        this.updateBoard(e.target, playerTurnResult.hit)
+      }
+      // Check if player won
+      if (playerTurnResult.winner === 'player') {
+        const modal = new ModalController(this.#uimanager)
+        const result = {
+          time: {
+            name: 'Time',
+            value: this.#calculateAndFormatGameTime()
+          },
+          ships: {
+            name: 'Ships left',
+            value: player.ships.filter(s => !s.isSunk()).length,
+          },
+          misses: {
+            name: 'Missed Shots',
+            value: computer.board.reduce((a, c) => a + c.filter(e => e === -1).length, 0)
+          }
+        }
+        const modalUI = document.querySelector('.modal')
+        const m = modal.render('Player', result, (/**@type {Event} */e) => {
+          if (modalUI instanceof HTMLDivElement) {
+            modalUI.style.display = 'none'
+            modalUI.removeChild(m)
+          }
+        })
+        modalUI.appendChild(m)
+        if (modalUI instanceof HTMLDivElement) {
+          modalUI.style.display = 'flex'
+        }
+
+        console.log(`${player.name} wins the game!`)
+        return;
+      }
+      if (playerTurnResult.gameOn) {
+        // TODO show modal asking for second player
+        // Computer turn
+        playerTwoTurnResult = this.#game.playTurn(computer, coordinates, this.#gameMode)
+        // Update the UI for the computer's attack on the player's board
+        this.updatePlayerBoardUI(playerTwoTurnResult.coordinates, playerTwoTurnResult.hit);
+
+        // Check if computer won immediately after their turn
+        if (playerTwoTurnResult.winner === 'computer') {
+          console.log(`${computer.name} wins the game!`);
+          const modal = new ModalController(this.#uimanager)
+          const result = {
+            time: {
+              name: 'Time',
+              value: this.#calculateAndFormatGameTime()
+            },
+            ships: {
+              name: 'Ships left',
+              value: computer.ships.filter(s => !s.isSunk()).length, // Computer wins, so show player's remaining ships
+            },
+            misses: {
+              name: 'Missed Shots',
+              value: player.board.reduce((a, c) => a + c.filter(e => e === -1).length, 0) // Computer wins, so show player's missed shots on their board
+            }
+          }
+          const modalUI = document.querySelector('.modal')
+          const m = modal.render('Player 2', result, (/**@type {Event} */e) => {
+            if (modalUI instanceof HTMLDivElement) {
+              modalUI.style.display = 'none'
+              modalUI.removeChild(m)
+            }
+          })
+          modalUI.appendChild(m)
+          if (modalUI instanceof HTMLDivElement) {
+            modalUI.style.display = 'flex'
+          }
+          return; // Game is over
+        }
+      }
+
+    } else if (this.#game) {
       // Player Turn
       playerTurnResult = this.#game.playTurn(player, coordinates)
       if (playerTurnResult.error) {
@@ -294,7 +381,7 @@ class AppController {
     const control = document.querySelector('.control-container')
     const bController = new BoardController(this.#uimanager)
     const newBoard = bController.renderBoard(this.#player,
-      null, // No click handler for player's own board
+      (e) => this.handleCellClick(e, this.#gameboard, this.#player, this.#computer),
       (e, coords, pieceData) => this.handlePlayerCellDrop(e, coords, pieceData),
       (e, coords) => this.handlePlayerCellDragOver(e, coords),
       (e, coords) => this.handlePlayerCellDragEnter(e, coords),
@@ -321,6 +408,8 @@ class AppController {
     // each player sees the others empty board but its own ship-filled board
     // A modal will order the switch after each turn
     // Add either wide blur or black screen
+    this.#gameMode = 'two'
+    this.handleRandomCommand(e)
   }
 
   /**
@@ -336,6 +425,9 @@ class AppController {
     this.#computer.board = this.#gameboard.computerBoard
     this.#player.ships = this.#gameboard.playerShips // Should be empty after resetPlayerBoard
     this.#computer.ships = this.#gameboard.computerShips // Should be empty after resetComputerBoard
+
+    // reset into single player mode
+    this.#gameMode = 'single'
 
     // Reset all pieces to 'unplaced' for the pieces pane
     this.#pieces.forEach(p => p.placed = false);
