@@ -92,6 +92,7 @@ class BoardController {
             if (handlePlayerCellDragLeave) handlePlayerCellDragLeave(e, [i, j]);
           });
         }
+        // TODO add condition for a two player mode to allow players to click on each board cells
       }
     }
     return boardContainer

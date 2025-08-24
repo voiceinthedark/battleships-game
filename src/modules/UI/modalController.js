@@ -14,7 +14,6 @@
  * @property {number} misses.value
  * */
 
-import Player from "../player.js"
 import UIManager from "./uimanager.js"
 
 class ModalController {

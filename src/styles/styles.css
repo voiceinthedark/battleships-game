@@ -39,6 +39,10 @@
   --cell-size: 45px;
 }
 
+.blurred{
+  filter: blur(20px);
+}
+
 body {
   margin: 0;
   padding: 0;

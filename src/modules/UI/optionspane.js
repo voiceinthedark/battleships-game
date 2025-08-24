@@ -41,6 +41,10 @@ class OptionsPane {
     randomCommand.textContent = 'Random Placement'
     randomCommand.addEventListener('click', handleRandomCommand)
 
+    const twoplayerCommand = this.#uimanager.addElement('button', commandPane, 'command-two')
+    twoplayerCommand.textContent = 'Two Player game'
+    // TODO add event listeners
+
     const resetCommand = this.#uimanager.addElement('button', commandPane, 'command-reset')
     resetCommand.textContent = "Reset Pieces"
     resetCommand.addEventListener('click', handleResetCommand)

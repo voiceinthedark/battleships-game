@@ -30,6 +30,8 @@ class AppController {
   #player
   /**@type {Player} */
   #computer
+  /**@type {string} */
+  #gameMode
 
 
   /**
@@ -44,6 +46,7 @@ class AppController {
     this.#gameboard = null
     this.#player = null
     this.#computer = null
+    this.#gameMode = 'single' // default mode is single player
   }
 
   /**
@@ -307,6 +310,20 @@ class AppController {
   }
 
   /**
+   * @method to handle the two player mode
+   * @param {Event} e 
+   * */
+  handleTwoPlayerCommand(e){
+    e.preventDefault()
+
+    // TODO implement the two player mode
+    // The boards need to be populated randomly
+    // each player sees the others empty board but its own ship-filled board
+    // A modal will order the switch after each turn
+    // Add either wide blur or black screen
+  }
+
+  /**
    * Handle the reset command
    * @param {Event} e 
    * */
@@ -353,7 +370,6 @@ class AppController {
    * @param {Event} e 
    * */
   handleStartCommand(e) {
-    // TODO error in starting without input
     e.preventDefault()
     // NOTE make sure there are pieces on the board and player/computer ships are assigned before starting
     if (this.#player.ships.length === 0) {
@@ -585,13 +601,12 @@ class AppController {
     // Clear any drag feedback for the dropped piece's potential area
     this.#clearDragFeedback(coords, length, orientation);
 
-    if (this.#isValidPlacement([row, col], length, orientation, this.#player.board)) {
+
+    if (this.#isValidPlacement([row, col], length, orientation, this.#player.board) && this.#player.ships.length < 9) {
       // Create a Ship object using the existing Ship class structure
       const newShip = new Ship(pieceId, length, orientation);
       const placementResult = this.#gameboard.placeShip(newShip, coords, this.#player.board); // Pass this.#player.board
 
-      // FIX the problem is that the computer board and ships aren't generate
-      // FIX make the computer generate its own board
 
       if (placementResult) { // gameboard.placeShip returns true on success, false on failure
         // Mark the piece as placed in the internal array
@@ -710,12 +725,14 @@ class AppController {
         if (modalUI instanceof HTMLDivElement) {
           modalUI.style.display = 'none'
           modalUI.removeChild(m)
+          this.#appContainer.classList.remove('blurred')
         }
       })
     if (modalUI) {
       modalUI.appendChild(m)
       if (modalUI instanceof HTMLDivElement) {
         modalUI.style.display = 'flex'
+        this.#appContainer.classList.add('blurred')
       }
     }
   }
