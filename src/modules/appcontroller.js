@@ -313,7 +313,7 @@ class AppController {
    * @method to handle the two player mode
    * @param {Event} e 
    * */
-  handleTwoPlayerCommand(e){
+  handleTwoPlayerCommand(e) {
     e.preventDefault()
 
     // TODO implement the two player mode
@@ -349,13 +349,16 @@ class AppController {
     const startButton = document.querySelector('.command-start')
     const randomButton = document.querySelector('.command-random')
     const rotateButton = document.querySelector('.command-rotate')
+    const twoplayerButton = document.querySelector('.command-two')
 
     if (startButton instanceof HTMLButtonElement
       && randomButton instanceof HTMLButtonElement
-      && rotateButton instanceof HTMLButtonElement) {
+      && rotateButton instanceof HTMLButtonElement
+      && twoplayerButton instanceof HTMLButtonElement) {
       startButton.disabled = false
       randomButton.disabled = false
       rotateButton.disabled = false
+      twoplayerButton.disabled = false
     }
 
     const controlPiecesMessage = document.querySelector('.control-pieces-message')
@@ -403,13 +406,16 @@ class AppController {
     const startButton = document.querySelector('.command-start')
     const randomButton = document.querySelector('.command-random')
     const rotateButton = document.querySelector('.command-rotate')
+    const twoplayerButton = document.querySelector('.command-two')
 
     if (startButton instanceof HTMLButtonElement
       && randomButton instanceof HTMLButtonElement
-      && rotateButton instanceof HTMLButtonElement) {
+      && rotateButton instanceof HTMLButtonElement
+      && twoplayerButton instanceof HTMLButtonElement) {
       startButton.disabled = true
       randomButton.disabled = true
       rotateButton.disabled = true
+      twoplayerButton.disabled = true
     }
 
     // NOTE fix for sticking message panel
@@ -602,7 +608,9 @@ class AppController {
     this.#clearDragFeedback(coords, length, orientation);
 
 
-    if (this.#isValidPlacement([row, col], length, orientation, this.#player.board) && this.#player.ships.length < 9) {
+    if (this.#isValidPlacement([row, col], length, orientation,
+      this.#player.board)
+      && this.#player.ships.length < 9) {
       // Create a Ship object using the existing Ship class structure
       const newShip = new Ship(pieceId, length, orientation);
       const placementResult = this.#gameboard.placeShip(newShip, coords, this.#player.board); // Pass this.#player.board

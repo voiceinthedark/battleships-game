@@ -163,7 +163,6 @@ class GameBoard {
    * @returns {boolean} true on hit false otherwise
    * */
   receiveAttack(coords, board) {
-    // TODO: receive an attack on the board and calculate
     // NOTE: misses will be marked on the corresponding board with an -1
     // NOTE: hits are marked with 9
     // NOTE: occupied slots are marked with 1
