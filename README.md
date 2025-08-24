@@ -12,6 +12,8 @@ console output:
 
 - [ ] Add interactive log 
 - [x] Add summary to game end
-- [ ] Add drag and drop feature for pieces placement
+- [x] Add drag and drop feature for pieces placement
 - [ ] Refine the board graphically
 - [ ] Add two player mode on same machine
+- [ ] refine the modal
+- [ ] add a smarter computer player

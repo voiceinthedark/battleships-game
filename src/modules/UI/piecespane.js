@@ -84,6 +84,11 @@ class PiecesPane {
       // piece.style.backgroundColor = 'green'
       // piece.style.border = '2px solid black'
     }
+
+    const controlPiecesHint = this.#uimanager.addElement('span', piecesBoard, 'control-pieces-hint')
+    controlPiecesHint.textContent = 'Drag and drop pieces on the board to begin...'
+    controlPiecesHint.style.color = 'gray'
+
     return piecesBoard
   }
 
