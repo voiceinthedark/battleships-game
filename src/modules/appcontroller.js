@@ -506,7 +506,7 @@ class AppController {
 
     // Ensure computer board (if present from previous game) is removed
     const controlContainer = document.querySelector('.control-container');
-    const computerBoardElement = controlContainer.querySelector('.board-container.board-computer-container'); // Assuming computer board gets this class
+    const computerBoardElement = controlContainer.querySelector('.board-container.board-computer-container');
     if (computerBoardElement) {
       computerBoardElement.remove();
     }
@@ -936,7 +936,7 @@ class AppController {
     const m = modal.renderMessage(
       {
         type: 'Player Switch',
-        message: `Player ${fromPlayerName}'s turn ended. It's now Player ${toPlayerName}'s turn. Click to continue.`
+        message: `Player ${fromPlayerName}'s turn ended. It's now Player ${toPlayerName}'s turn.`
       },
       (e) => {
         if (modalUI instanceof HTMLDivElement) {
@@ -959,7 +959,10 @@ class AppController {
       if (modalUI instanceof HTMLDivElement) {
         modalUI.style.display = 'flex';
         this.#appContainer.classList.add('blurred');
+        modalUI.style.opacity = '1';
+        m.style.opacity = '1';
       }
+
     }
   }
 
