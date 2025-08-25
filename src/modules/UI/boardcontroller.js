@@ -29,6 +29,7 @@ class BoardController {
    * @param {(event: DragEvent, coords: number[]) => void} [handlePlayerCellDragEnter] - callback for drag enter on player's board
    * @param {(event: DragEvent, coords: number[]) => void} [handlePlayerCellDragLeave] - callback for drag leave on player's board
    * @param {string} [gamemode='single'] - gamemode single or two [default: single]
+   * @param {boolean} [showShips=false] - Whether to visually display the ships on this board (e.g., for owner's board)
    * @returns {HTMLElement} The board container element.
    * */
   renderBoard(player,
@@ -37,17 +38,21 @@ class BoardController {
     handlePlayerCellDragOver,
     handlePlayerCellDragEnter,
     handlePlayerCellDragLeave,
-    gamemode = 'single') {
+    gamemode = 'single',
+    showShips = false) {
+
     let boardContainer = document.createElement('div')
     boardContainer.classList.add('board-container')
     if (player.name === 'player') {
       boardContainer.classList.add('board-player-container');
+    } else {
+      boardContainer.classList.add('board-computer-container'); // Add container class for computer too for consistency
     }
 
     let nameSpan = this.#uimanager.addElement('span', boardContainer, 'board-name')
     nameSpan.textContent = `${player.name}`
 
-    let boardElement = this.#uimanager.addElement('div', boardContainer, 'board-player'); // Renamed from boardPlayer for clarity
+    let boardElement = this.#uimanager.addElement('div', boardContainer, 'board-player');
     if (player.name === 'computer') {
       boardElement.classList.remove('board-player')
       boardElement.classList.add('board-computer')
@@ -58,8 +63,8 @@ class BoardController {
         let boardCell = this.#uimanager.addElement('div', boardElement, 'board-cell')
         boardCell.dataset.id = `${i},${j}`
 
-        // Apply visual styles for placed ships on player's board
-        if (player.board[i][j] === 1 && player.name === 'player' && gamemode === 'single') {
+        // Apply visual styles for placed ships if showShips is true
+        if (player.board[i][j] === 1 && showShips) {
           boardCell.style.backgroundColor = 'green'
         }
         // Apply visual styles for hit/missed cells (for both boards if applicable)
@@ -69,14 +74,13 @@ class BoardController {
           boardCell.style.backgroundColor = 'gray'
         }
 
-        // TODO add condition for a two player mode to allow players to click on each board cells
-        if (player.name === 'computer') {
-          // Only on computer board add handle click on the cells for attacking
+        // Attach attack listener if provided
+        if (handleComputerCellClick) {
           boardCell.addEventListener('click', handleComputerCellClick)
-        } else if (player.name === 'player' && gamemode === 'two') {
-          boardCell.addEventListener('click', handleComputerCellClick)
-        } else if (player.name === 'player') {
-          // Add drag-and-drop listeners to player's board cells
+        }
+
+        // Attach drag-and-drop listeners only if gamemode is single and player's own board
+        if (gamemode === 'single' && player.name === 'player' && handlePlayerCellDrop) {
           boardCell.addEventListener('dragover', (e) => {
             e.preventDefault(); // This is crucial to allow a drop
             if (handlePlayerCellDragOver) handlePlayerCellDragOver(e, [i, j]);
