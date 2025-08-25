@@ -33,6 +33,12 @@ class AppController {
   /**@type {string} */
   #gameMode
 
+  /**@type {Player} */
+  #currentPlayerTurn
+  /**@type {Player} */
+  #currentOpponent
+  #isPlayerSwitchPending
+
 
   /**
    * @param {HTMLElement} appContainer
@@ -47,6 +53,11 @@ class AppController {
     this.#player = null
     this.#computer = null
     this.#gameMode = 'single' // default mode is single player
+
+
+    this.#currentPlayerTurn = null;
+    this.#currentOpponent = null;
+    this.#isPlayerSwitchPending = false;
   }
 
   /**
@@ -60,7 +71,7 @@ class AppController {
     this.#gameboard = gameboard;
     this.#player = player;
     this.#computer = computer;
-    // FIX for the error of undefined ships object
+    // NOTE FIX for the error of undefined ships object
     this.#player.ships = gameboard.playerShips
     this.#computer.ships = gameboard.computerShips
 
@@ -89,55 +100,60 @@ class AppController {
     this.#gameboard = gameboard;
     this.#player = player;
     this.#computer = computer;
-    // FIX for the error of undefined ships object
+    // NOTE FIX for the error of undefined ships object
     this.#player.ships = gameboard.playerShips
     this.#computer.ships = gameboard.computerShips
 
     const board = new BoardController(this.#uimanager)
     const boardUI = board.renderBoard(player,
-      (e) => this.handleCellClick(e, gameboard, player, computer),
+      (e) => this.handleCellClick(e),
       (e, coords, pieceData) => this.handlePlayerCellDrop(e, coords, pieceData),
       (e, coords) => this.handlePlayerCellDragOver(e, coords),
       (e, coords) => this.handlePlayerCellDragEnter(e, coords),
-      (e, coords) => this.handlePlayerCellDragLeave(e, coords), this.#gameMode)
+      (e, coords) => this.handlePlayerCellDragLeave(e, coords), this.#gameMode, true) // show ships for player
     this.#appContainer.appendChild(boardUI)
   }
 
   /**
    * Handle the cell click on the board
    * @param {Event} e - event object of the click 
-   * @param {GameBoard} gameboard - the gameboard
-   * @param {Player} player - the player
-   * @param {Player} computer - the computer
    * */
-  handleCellClick(e, gameboard, player, computer) {
+  handleCellClick(e) {
     // WARN: disable clicking the cells after initial game setup
     e.preventDefault()
+    if (this.#isPlayerSwitchPending) {
+      console.log('Player switch pending, no clicks allowed.');
+      return;
+    }
+
     let coordinates
     /** @type {import('./game.js').Result} */
-    let playerTurnResult;
-    /** @type {import('./game.js').Result} */
-    let computerTurnResult;
-    /** @type {import('./game.js').Result} */
-    let playerTwoTurnResult
+    let turnResult;
+
     if (e.target instanceof HTMLElement) {
       console.log(`${e.target.dataset.id}`)
       coordinates = e.target.dataset.id.split(',')
     }
     if (this.#game && this.#gameMode === 'two') {
-      // two player game mode
-      // TODO show modal asking for first player to play
-      // Player 1 turn
-      playerTurnResult = this.#game.playTurn(player, coordinates, this.#gameMode)
-      if (playerTurnResult.error) {
-        console.log(`Player turn error ${playerTurnResult.error}`)
+      // Ensure the clicked cell belongs to the current opponent's board
+      // The `e.target` for a click on the opponent's board will be a `.board-cell` inside `.opponent-board-for-attack`
+      const clickedBoardContainer = e.target.closest('.opponent-board-for-attack');
+      if (!clickedBoardContainer) {
+        console.log('Click not on opponent\'s board, ignoring.');
+        return;
+      }
+
+      turnResult = this.#game.playTurn(this.#currentPlayerTurn, this.#currentOpponent, coordinates, this.#gameMode)
+
+      if (turnResult.error) {
+        console.log(`Player turn error ${turnResult.error}`)
         return
       }
       if (e.target instanceof HTMLDivElement) {
-        this.updateBoard(e.target, playerTurnResult.hit)
+        this.updateBoard(e.target, turnResult.hit)
       }
-      // Check if player won
-      if (playerTurnResult.winner === 'player') {
+      // Check if current player won
+      if (turnResult.winner === this.#currentPlayerTurn.name) {
         const modal = new ModalController(this.#uimanager)
         const result = {
           time: {
@@ -146,80 +162,49 @@ class AppController {
           },
           ships: {
             name: 'Ships left',
-            value: player.ships.filter(s => !s.isSunk()).length,
+            value: this.#currentPlayerTurn.ships.filter(s => !s.isSunk()).length,
           },
           misses: {
             name: 'Missed Shots',
-            value: computer.board.reduce((a, c) => a + c.filter(e => e === -1).length, 0)
+            value: this.#currentOpponent.board.reduce((a, c) => a + c.filter(e => e === -1).length, 0)
           }
         }
         const modalUI = document.querySelector('.modal')
-        const m = modal.render('Player', result, (/**@type {Event} */e) => {
+        const m = modal.render(this.#currentPlayerTurn.name, result, (/**@type {Event} */e) => {
           if (modalUI instanceof HTMLDivElement) {
             modalUI.style.display = 'none'
             modalUI.removeChild(m)
+            this.#appContainer.classList.remove('blurred')
           }
         })
         modalUI.appendChild(m)
         if (modalUI instanceof HTMLDivElement) {
           modalUI.style.display = 'flex'
+          this.#appContainer.classList.add('blurred')
         }
 
-        console.log(`${player.name} wins the game!`)
+        console.log(`${this.#currentPlayerTurn.name} wins the game!`)
         return;
       }
-      if (playerTurnResult.gameOn) {
-        // TODO show modal asking for second player
-        // Computer turn
-        playerTwoTurnResult = this.#game.playTurn(computer, coordinates, this.#gameMode)
-        // Update the UI for the computer's attack on the player's board
-        this.updatePlayerBoardUI(playerTwoTurnResult.coordinates, playerTwoTurnResult.hit);
 
-        // Check if computer won immediately after their turn
-        if (playerTwoTurnResult.winner === 'computer') {
-          console.log(`${computer.name} wins the game!`);
-          const modal = new ModalController(this.#uimanager)
-          const result = {
-            time: {
-              name: 'Time',
-              value: this.#calculateAndFormatGameTime()
-            },
-            ships: {
-              name: 'Ships left',
-              value: computer.ships.filter(s => !s.isSunk()).length, // Computer wins, so show player's remaining ships
-            },
-            misses: {
-              name: 'Missed Shots',
-              value: player.board.reduce((a, c) => a + c.filter(e => e === -1).length, 0) // Computer wins, so show player's missed shots on their board
-            }
-          }
-          const modalUI = document.querySelector('.modal')
-          const m = modal.render('Player 2', result, (/**@type {Event} */e) => {
-            if (modalUI instanceof HTMLDivElement) {
-              modalUI.style.display = 'none'
-              modalUI.removeChild(m)
-            }
-          })
-          modalUI.appendChild(m)
-          if (modalUI instanceof HTMLDivElement) {
-            modalUI.style.display = 'flex'
-          }
-          return; // Game is over
-        }
+      if (turnResult.gameOn) {
+        // Game continues, trigger player switch modal
+        this.#isPlayerSwitchPending = true;
+        this.#displaySwitchPlayerModal(this.#currentPlayerTurn.name, this.#currentOpponent.name);
       }
-
     } else if (this.#game) {
+      // Single player game mode
       // Player Turn
-      playerTurnResult = this.#game.playTurn(player, coordinates)
-      if (playerTurnResult.error) {
-        console.log(`Player turn error ${playerTurnResult.error}`)
+      turnResult = this.#game.playTurn(this.#player, this.#computer, coordinates) // Player attacks computer
+      if (turnResult.error) {
+        console.log(`Player turn error ${turnResult.error}`)
         return
       }
       if (e.target instanceof HTMLDivElement) {
-        this.updateBoard(e.target, playerTurnResult.hit)
+        this.updateBoard(e.target, turnResult.hit)
       }
       // Check if player won
-      if (playerTurnResult.winner === 'player') {
+      if (turnResult.winner === 'player') {
         const modal = new ModalController(this.#uimanager)
         const result = {
           time: {
@@ -228,11 +213,11 @@ class AppController {
           },
           ships: {
             name: 'Ships left',
-            value: player.ships.filter(s => !s.isSunk()).length,
+            value: this.#player.ships.filter(s => !s.isSunk()).length,
           },
           misses: {
             name: 'Missed Shots',
-            value: computer.board.reduce((a, c) => a + c.filter(e => e === -1).length, 0)
+            value: this.#computer.board.reduce((a, c) => a + c.filter(e => e === -1).length, 0)
           }
         }
         const modalUI = document.querySelector('.modal')
@@ -240,25 +225,27 @@ class AppController {
           if (modalUI instanceof HTMLDivElement) {
             modalUI.style.display = 'none'
             modalUI.removeChild(m)
+            this.#appContainer.classList.remove('blurred')
           }
         })
         modalUI.appendChild(m)
         if (modalUI instanceof HTMLDivElement) {
           modalUI.style.display = 'flex'
+          this.#appContainer.classList.add('blurred')
         }
 
-        console.log(`${player.name} wins the game!`)
+        console.log(`${this.#player.name} wins the game!`)
         return;
       }
-      if (playerTurnResult.gameOn) {
+      if (turnResult.gameOn) {
         // Computer turn
-        computerTurnResult = this.#game.playTurn(computer)
+        const computerTurnResult = this.#game.playTurn(this.#computer, this.#player) // Computer attacks player
         // Update the UI for the computer's attack on the player's board
         this.updatePlayerBoardUI(computerTurnResult.coordinates, computerTurnResult.hit);
 
         // Check if computer won immediately after their turn
         if (computerTurnResult.winner === 'computer') {
-          console.log(`${computer.name} wins the game!`);
+          console.log(`${this.#computer.name} wins the game!`);
           const modal = new ModalController(this.#uimanager)
           const result = {
             time: {
@@ -267,11 +254,11 @@ class AppController {
             },
             ships: {
               name: 'Ships left',
-              value: computer.ships.filter(s => !s.isSunk()).length, // Computer wins, so show player's remaining ships
+              value: this.#computer.ships.filter(s => !s.isSunk()).length, // Computer wins, so show player's remaining ships
             },
             misses: {
               name: 'Missed Shots',
-              value: player.board.reduce((a, c) => a + c.filter(e => e === -1).length, 0) // Computer wins, so show player's missed shots on their board
+              value: this.#player.board.reduce((a, c) => a + c.filter(e => e === -1).length, 0) // Computer wins, so show player's missed shots on their board
             }
           }
           const modalUI = document.querySelector('.modal')
@@ -279,11 +266,13 @@ class AppController {
             if (modalUI instanceof HTMLDivElement) {
               modalUI.style.display = 'none'
               modalUI.removeChild(m)
+              this.#appContainer.classList.remove('blurred')
             }
           })
           modalUI.appendChild(m)
           if (modalUI instanceof HTMLDivElement) {
             modalUI.style.display = 'flex'
+            this.#appContainer.classList.add('blurred')
           }
           return; // Game is over
         }
@@ -372,20 +361,24 @@ class AppController {
 
     Utils.randomizeOrientation(this.#pieces)
     Utils.populateBoardRandomly(this.#gameboard, this.#pieces, this.#player)
+    this.#player.ships = this.#gameboard.playerShips
+
+    this.#pieces.forEach(p => p.placed = false); // Reset placed status for computer ships
     Utils.randomizeOrientation(this.#pieces)
     Utils.populateBoardRandomly(this.#gameboard, this.#pieces, this.#computer)
-    this.#player.ships = this.#gameboard.playerShips
     this.#computer.ships = this.#gameboard.computerShips
 
 
     const control = document.querySelector('.control-container')
     const bController = new BoardController(this.#uimanager)
     const newBoard = bController.renderBoard(this.#player,
-      (e) => this.handleCellClick(e, this.#gameboard, this.#player, this.#computer),
+      null,
       (e, coords, pieceData) => this.handlePlayerCellDrop(e, coords, pieceData),
       (e, coords) => this.handlePlayerCellDragOver(e, coords),
       (e, coords) => this.handlePlayerCellDragEnter(e, coords),
-      (e, coords) => this.handlePlayerCellDragLeave(e, coords)
+      (e, coords) => this.handlePlayerCellDragLeave(e, coords),
+      this.#gameMode,
+      true // showShips for player's board
     )
     // Remove the old player board if it exists before adding the new one
     const oldPlayerBoardContainer = document.querySelector('.board-container.board-player-container');
@@ -403,13 +396,61 @@ class AppController {
   handleTwoPlayerCommand(e) {
     e.preventDefault()
 
-    // TODO implement the two player mode
-    // The boards need to be populated randomly
-    // each player sees the others empty board but its own ship-filled board
-    // A modal will order the switch after each turn
-    // Add either wide blur or black screen
     this.#gameMode = 'two'
-    this.handleRandomCommand(e)
+
+    // Clear existing boards
+    document.querySelectorAll('.board-container').forEach(board => board.remove());
+
+    this.#gameboard.resetPlayerBoard();
+    this.#gameboard.resetComputerBoard();
+    this.#player.board = this.#gameboard.playerBoard;
+    this.#computer.board = this.#gameboard.computerBoard;
+
+    // Place ships randomly for both players
+    this.#pieces.forEach(p => p.placed = false); // Ensure all pieces are available for new random placement
+    Utils.randomizeOrientation(this.#pieces);
+    Utils.populateBoardRandomly(this.#gameboard, this.#pieces, this.#player);
+    this.#player.ships = this.#gameboard.playerShips; // Update player ships after placement
+
+    this.#pieces.forEach(p => p.placed = false); // Reset placed status for computer ships
+    Utils.randomizeOrientation(this.#pieces);
+    Utils.populateBoardRandomly(this.#gameboard, this.#pieces, this.#computer);
+    this.#computer.ships = this.#gameboard.computerShips;
+
+    // Set initial active players
+    this.#currentPlayerTurn = this.#player; // Player 1 starts
+    this.#currentOpponent = this.#computer; // Player 1 attacks Player 2's board
+
+    // Remove the control pane to prepare for game boards
+    const controlContainer = document.querySelector('.control-container');
+    const controlPieces = controlContainer.querySelector('.control-pieces-section');
+    if (controlPieces) {
+      controlPieces.remove();
+    }
+    const controlPiecesMessage = controlContainer.querySelector('.control-pieces-message');
+    if (controlPiecesMessage) {
+      controlPiecesMessage.remove();
+    }
+
+    this.#renderTwoPlayerBoards(); // Display boards for the first player's turn
+
+    // Disable 'random', 'rotate', 'two-player' buttons, enable 'reset'
+    const startButton = document.querySelector('.command-start');
+    const randomButton = document.querySelector('.command-random');
+    const rotateButton = document.querySelector('.command-rotate');
+    const twoplayerButton = document.querySelector('.command-two');
+    if (startButton instanceof HTMLButtonElement && randomButton instanceof HTMLButtonElement && rotateButton instanceof HTMLButtonElement && twoplayerButton instanceof HTMLButtonElement) {
+      startButton.disabled = true; // Game implicitly started
+      randomButton.disabled = true;
+      rotateButton.disabled = true;
+      twoplayerButton.disabled = true;
+    }
+
+    // Initialize game object if it's not already
+    if (!this.#game) {
+      this.#game = new Game(this.#gameboard, this.#player, this.#computer);
+    }
+    this.#gameStartTime = Date.now(); // Start game timer
   }
 
   /**
@@ -428,6 +469,11 @@ class AppController {
 
     // reset into single player mode
     this.#gameMode = 'single'
+    this.#currentPlayerTurn = null;
+    this.#currentOpponent = null;
+    this.#isPlayerSwitchPending = false;
+    this.#game = null; // Clear game instance
+    this.#gameStartTime = null; // Reset game time
 
     // Reset all pieces to 'unplaced' for the pieces pane
     this.#pieces.forEach(p => p.placed = false);
@@ -457,6 +503,13 @@ class AppController {
     if (controlPiecesMessage) {
       controlPiecesMessage.remove()
     }
+
+    // Ensure computer board (if present from previous game) is removed
+    const controlContainer = document.querySelector('.control-container');
+    const computerBoardElement = controlContainer.querySelector('.board-container.board-computer-container'); // Assuming computer board gets this class
+    if (computerBoardElement) {
+      computerBoardElement.remove();
+    }
   }
 
 
@@ -479,14 +532,36 @@ class AppController {
       this.#computer.ships = this.#gameboard.computerShips
     }
 
+    if (this.#gameMode === 'two') {
+      // In two-player mode, ships are already placed by handleRandomCommand (called from handleTwoPlayerCommand).
+      // The game boards are also rendered by handleTwoPlayerCommand.
+      // Buttons should already be disabled. If not, this is a fallback.
+      const startButton = document.querySelector('.command-start');
+      const randomButton = document.querySelector('.command-random');
+      const rotateButton = document.querySelector('.command-rotate');
+      const twoplayerButton = document.querySelector('.command-two');
+
+      if (startButton instanceof HTMLButtonElement && randomButton instanceof HTMLButtonElement && rotateButton instanceof HTMLButtonElement && twoplayerButton instanceof HTMLButtonElement) {
+        startButton.disabled = true;
+        randomButton.disabled = true;
+        rotateButton.disabled = true;
+        twoplayerButton.disabled = true;
+      }
+      // Game object and start time already set by handleTwoPlayerCommand
+      return; // Don't proceed with single player specific board replacement
+    }
+
+
     // Need to remove the pieces pane and replace it with computer board
     // Get the control container and replace it with a board-container
     const controlContainer = document.querySelector('.control-container')
     const controlPieces = document.querySelector('.control-pieces-section')
     const bController = new BoardController(this.#uimanager)
     const computerBoard = bController.renderBoard(this.#computer,
-      (e) => this.handleCellClick(e, this.#gameboard, this.#player, this.#computer),
-      null, null, null, null // No drag/drop handlers for computer board
+      (e) => this.handleCellClick(e), // Attack handler for computer board
+      null, null, null, null, // No drag/drop handlers for computer board
+      this.#gameMode,
+      false // Do not show computer's ships
     )
     if (controlPieces) {
       controlContainer.replaceChild(computerBoard, controlPieces)
@@ -762,7 +837,9 @@ class AppController {
       (e, coords, pieceData) => this.handlePlayerCellDrop(e, coords, pieceData),
       (e, coords) => this.handlePlayerCellDragOver(e, coords),
       (e, coords) => this.handlePlayerCellDragEnter(e, coords),
-      (e, coords) => this.handlePlayerCellDragLeave(e, coords)
+      (e, coords) => this.handlePlayerCellDragLeave(e, coords),
+      this.#gameMode,
+      true // show ships on player's board during setup
     );
     if (oldBoardContainer.parentNode) {
       oldBoardContainer.parentNode.replaceChild(newBoardUI, oldBoardContainer);
@@ -806,6 +883,83 @@ class AppController {
       messageElement.style.textAlign = 'center';
       messageElement.style.padding = '20px';
       messageElement.style.border = '1px dashed #ccc';
+    }
+  }
+
+  /**
+     * Helper to render boards for two-player mode, switching views.
+     */
+  #renderTwoPlayerBoards() {
+    const appContainer = this.#appContainer;
+    // Clear all existing board UIs from the app container
+    appContainer.querySelectorAll('.board-container').forEach(el => el.remove());
+
+    const bController = new BoardController(this.#uimanager);
+
+    // Render current player's own board (with ships, NOT clickable for attack)
+    const currentPlayerOwnBoardUI = bController.renderBoard(
+      this.#currentPlayerTurn,
+      null, // No attack handler on own board
+      null, null, null, null, // No drag/drop during game
+      this.#gameMode,
+      true // Show ships for the owner's board
+    );
+    currentPlayerOwnBoardUI.classList.add('current-player-own-board');
+
+    // Render opponent's board (NO ships displayed, IS clickable for attack)
+    const opponentBoardUI = bController.renderBoard(
+      this.#currentOpponent,
+      (e) => this.handleCellClick(e), // Attach attack handler to opponent's board
+      null, null, null, null, // No drag/drop during game
+      this.#gameMode,
+      false // DO NOT show ships for the opponent's board
+    );
+    opponentBoardUI.classList.add('opponent-board-for-attack');
+
+    // Append boards to the main app container
+    const controlContainer = document.querySelector('.control-container')
+    controlContainer.before(currentPlayerOwnBoardUI)
+    // appContainer.appendChild(currentPlayerOwnBoardUI);
+    const controlCommand = document.querySelector('.command-pane')
+    controlCommand.before(opponentBoardUI)
+    // appContainer.appendChild(opponentBoardUI);
+  }
+
+  /**
+     * Helper to display a modal for player switching.
+     * @param {string} fromPlayerName - The name of the player whose turn just ended.
+     * @param {string} toPlayerName - The name of the player whose turn is next.
+     */
+  #displaySwitchPlayerModal(fromPlayerName, toPlayerName) {
+    const modal = new ModalController(this.#uimanager);
+    const modalUI = document.querySelector('.modal');
+    const m = modal.renderMessage(
+      {
+        type: 'Player Switch',
+        message: `Player ${fromPlayerName}'s turn ended. It's now Player ${toPlayerName}'s turn. Click to continue.`
+      },
+      (e) => {
+        if (modalUI instanceof HTMLDivElement) {
+          modalUI.style.display = 'none';
+          modalUI.removeChild(m);
+          this.#appContainer.classList.remove('blurred');
+          this.#isPlayerSwitchPending = false; // Allow clicks again after modal is closed
+
+          // Toggle active and opponent players for the next turn
+          const tempPlayer = this.#currentPlayerTurn;
+          this.#currentPlayerTurn = this.#currentOpponent;
+          this.#currentOpponent = tempPlayer;
+
+          this.#renderTwoPlayerBoards(); // Re-render boards for the new active player
+        }
+      }
+    );
+    if (modalUI) {
+      modalUI.appendChild(m);
+      if (modalUI instanceof HTMLDivElement) {
+        modalUI.style.display = 'flex';
+        this.#appContainer.classList.add('blurred');
+      }
     }
   }
 
