@@ -102,72 +102,67 @@ class Game {
 
   /**
    * @method playTurn to let the player/computer play a turn
-   * @param {Player} player - the player whose turn to play 
+   * @param {Player} attackingPlayer - the player whose turn to play 
+   * @param {Player} targetPlayer 
    * @param {Array} [coordinates=null] - the coordinates of the attack of the player exclusively
    * @param {string} [gamemode='single'] - The gamemode of the game
    * @returns {Result} result - an object containing, hit, gameOn, and winner if any
    * */
-  playTurn(player, coordinates = null, gamemode = 'single') {
+  playTurn(attackingPlayer, targetPlayer, coordinates = null, gamemode = 'single') {
     let coords;
     let hit = false
     let gameOn = true
     let winner = ''
-    // TODO when player is computer and game mode is two players
-    if (player.name === 'computer' && gamemode === 'two') {
-      if (!coordinates) {
-        console.error('Player should provide coordinates');
-        return { hit: false, gameOn: true, winner: '', error: 'no coordinates provided' }
-      }
 
-      coords = coordinates.map((n) => parseInt(n))
-      if (this.#player.board[coords[0]][coords[1]] === -1
-        || this.#player.board[coords[0]][coords[1]] === 9) {
-        console.log(`already attacked cell ${coords}`)
-        return { hit: false, gameOn: true, winner: '', coordinates: coords, error: "Already attacked" }
+    if (gamemode === 'two') {
+      if (!coordinates) {
+        console.error('Coordinates must be provided in two-player mode.');
+        return { hit: false, gameOn: true, winner: '', error: 'no coordinates provided' };
       }
-      // NOTE attack the cell otherwise
-      hit = this.#gameboard.receiveAttack(coords, this.#player.board);
-      if (this.#gameboard.shipsSunk(this.#player.ships)) {
+      coords = coordinates.map((n) => parseInt(n));
+      // Check if the cell on the target player's board has already been attacked
+      if (targetPlayer.board[coords[0]][coords[1]] === -1 || targetPlayer.board[coords[0]][coords[1]] === 9) {
+        console.log(`Cell ${coords} on ${targetPlayer.name}'s board already attacked.`);
+        return { hit: false, gameOn: true, winner: '', coordinates: coords, error: "Already attacked" };
+      }
+      hit = this.#gameboard.receiveAttack(coords, targetPlayer.board);
+      if (this.#gameboard.shipsSunk(targetPlayer.ships)) {
         gameOn = false;
-        winner = 'player 2';
+        winner = attackingPlayer.name; // The attacking player wins
       }
       return { hit, gameOn, winner, coordinates: coords };
-    } else if (player.name === 'computer') { // Computer turn
-      coords = [Math.floor(Math.random() * this.#gameboard.height), Math.floor(Math.random() * this.#gameboard.width)]
-      while (this.#player.board[coords[0]][coords[1]] === -1
-        || this.#player.board[coords[0]][coords[1]] === 9) {
-        coords = [Math.floor(Math.random() * this.#gameboard.height), Math.floor(Math.random() * this.#gameboard.width)]
+    } else { // Single player mode
+      if (attackingPlayer.name === 'player') { // Human player turn in single player
+        if (!coordinates) {
+          console.error('Player should provide coordinates');
+          return { hit: false, gameOn: true, winner: '', error: 'no coordinates provided' }
+        }
+        coords = coordinates.map((n) => parseInt(n))
+        if (targetPlayer.board[coords[0]][coords[1]] === -1 || targetPlayer.board[coords[0]][coords[1]] === 9) {
+          console.log(`already attacked cell ${coords}`)
+          return { hit: false, gameOn: true, winner: '', coordinates: coords, error: "Already attacked" }
+        }
+        hit = this.#gameboard.receiveAttack(coords, targetPlayer.board); // Player attacks computer's board
+        if (this.#gameboard.shipsSunk(targetPlayer.ships)) { // Check if computer's ships are sunk
+          gameOn = false;
+          winner = attackingPlayer.name;
+        }
+        return { hit, gameOn, winner, coordinates: coords };
+      } else if (attackingPlayer.name === 'computer') { // Computer turn in single player
+        coords = [Math.floor(Math.random() * this.#gameboard.height), Math.floor(Math.random() * this.#gameboard.width)];
+        // Ensure computer doesn't attack already attacked cells
+        while (targetPlayer.board[coords[0]][coords[1]] === -1 || targetPlayer.board[coords[0]][coords[1]] === 9) {
+          coords = [Math.floor(Math.random() * this.#gameboard.height), Math.floor(Math.random() * this.#gameboard.width)];
+        }
+        hit = this.#gameboard.receiveAttack(coords, targetPlayer.board); // Computer attacks player's board
+        if (this.#gameboard.shipsSunk(targetPlayer.ships)) { // Check if player's ships are sunk
+          gameOn = false;
+          winner = attackingPlayer.name;
+        }
+        return { hit, gameOn, winner, coordinates: coords };
       }
-      hit = this.#gameboard.receiveAttack(coords, this.#player.board)
-      if (this.#gameboard.shipsSunk(this.#player.ships)) {
-        // game over computer wins
-        gameOn = false
-        winner = 'computer'
-      }
-      return { hit, gameOn, winner, coordinates: coords }
     }
-    // Player turn
-    if (player.name === 'player') {
-      if (!coordinates) {
-        console.error('Player should provide coordinates');
-        return { hit: false, gameOn: true, winner: '', error: 'no coordinates provided' }
-      }
-
-      coords = coordinates.map((n) => parseInt(n))
-      if (this.#computer.board[coords[0]][coords[1]] === -1
-        || this.#computer.board[coords[0]][coords[1]] === 9) {
-        console.log(`already attacked cell ${coords}`)
-        return { hit: false, gameOn: true, winner: '', coordinates: coords, error: "Already attacked" }
-      }
-      // NOTE attack the cell otherwise
-      hit = this.#gameboard.receiveAttack(coords, this.#computer.board);
-      if (this.#gameboard.shipsSunk(this.#computer.ships)) {
-        gameOn = false;
-        winner = 'player';
-      }
-      return { hit, gameOn, winner, coordinates: coords };
-    }
-    return { hit: false, gameOn: true, winner: '', error: 'Unknown player type' };
+    return { hit: false, gameOn: true, winner: '', error: 'Unknown player type or game mode' };
   }
 
 }
